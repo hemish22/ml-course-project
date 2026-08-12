@@ -1,0 +1,37 @@
+paths:
+  raw: data/raw
+  processed: data/processed
+  index: data/index
+  results: results
+
+extract:
+  fps: 1.0
+  frame_width: 336
+  jpeg_quality: 88
+  use_scene_detect: false
+  audio_sample_rate: 16000
+
+models:
+  clip_name: ViT-B-32
+  clip_pretrained: laion2b_s34b_b79k
+  whisper_size: base
+  whisper_compute_type: int8
+  text_model: sentence-transformers/all-MiniLM-L6-v2
+
+encode:
+  batch_size: 64
+
+search:
+  alpha: 0.6
+  top_k_frames: 200
+  score_threshold: 0.28
+  merge_gap_s: 2.0
+  min_moment_s: 1.0
+  max_results: 10
+
+evaluation:
+  alpha_values: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+  pooling_methods: [mean, max]
+  clip_models: [ViT-B-32, ViT-L-14]
+  moment_iou_thresholds: [0.5, 0.7]
+  plot_dpi: 200

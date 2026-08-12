@@ -1,0 +1,20 @@
+# Generated video data and benchmark outputs
+data/
+results/
+
+# Python build and test artifacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Search indices
+*.faiss
+
+# Local environments and editor state
+.venv/
+venv/
+.env
+.DS_Store
+.streamlit/secrets.toml
