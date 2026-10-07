@@ -1,0 +1,200 @@
+.dialog {
+  width: min(520px, calc(100vw - 32px));
+  padding: 22px 24px 24px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--paper-raised);
+  color: var(--ink);
+  box-shadow: 0 30px 80px -20px rgba(13, 16, 23, 0.45);
+}
+
+.dialog::backdrop {
+  background: rgba(13, 16, 23, 0.45);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.head h2 {
+  margin: 0;
+  font-size: 20px;
+  letter-spacing: -0.02em;
+}
+
+.x {
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--ink-soft);
+}
+
+.x:hover {
+  background: var(--paper);
+}
+
+.drop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 34px 16px;
+  border: 2px dashed var(--line);
+  border-radius: 12px;
+  background: var(--paper);
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.dropActive {
+  border-color: var(--picture);
+  background: var(--picture-soft);
+}
+
+.dropTitle {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.dropSub {
+  margin: 0;
+  color: var(--ink-faint);
+}
+
+.choose,
+.primary {
+  height: 38px;
+  padding: 0 18px;
+  border-radius: 10px;
+  font-weight: 600;
+  border: 1px solid var(--ink);
+  background: var(--paper-raised);
+}
+
+.choose:hover {
+  background: var(--paper);
+}
+
+.primary {
+  margin-top: 16px;
+  background: var(--ink);
+  color: #fff;
+}
+
+.note {
+  margin: 14px 2px 0;
+  font-size: 13px;
+  color: var(--ink-soft);
+  max-width: 52ch;
+}
+
+.fileName {
+  margin: 0 0 12px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.steps li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.marker {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  border: 2px solid var(--line);
+  flex: none;
+}
+
+.todo {
+  color: var(--ink-faint);
+}
+
+.active {
+  font-weight: 600;
+}
+
+.active .marker {
+  border-color: var(--picture);
+  border-top-color: transparent;
+  animation: spin 0.9s linear infinite;
+}
+
+.done .marker {
+  background: var(--picture);
+  border-color: var(--picture);
+  color: #fff;
+}
+
+.failed .marker {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: #fff;
+}
+
+.pct {
+  margin-left: auto;
+  color: var(--ink-soft);
+  font-size: 13px;
+}
+
+.bar {
+  height: 6px;
+  margin-top: 16px;
+  border-radius: 3px;
+  background: var(--line);
+  overflow: hidden;
+}
+
+.bar i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(to right, var(--picture), var(--speech));
+  transition: width 0.6s ease;
+}
+
+.success {
+  margin: 16px 0 0;
+  font-weight: 600;
+}
+
+.error {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #fbeceb;
+  color: var(--danger);
+}
+
+.error p {
+  margin: 0 0 10px;
+  overflow-wrap: anywhere;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

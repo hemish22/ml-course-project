@@ -1,0 +1,43 @@
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: relative;
+}
+
+.row,
+.rowActive {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 8px;
+  padding: 7px 8px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  text-align: left;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--ink-soft);
+}
+
+.row:hover {
+  background: var(--paper-raised);
+}
+
+.rowActive {
+  background: var(--speech-soft);
+  color: var(--ink);
+}
+
+.at {
+  font-size: 12px;
+  color: var(--ink-faint);
+  padding-top: 2px;
+}
+
+.empty {
+  margin: 8px 2px;
+  color: var(--ink-soft);
+  max-width: 34ch;
+}

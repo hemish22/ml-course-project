@@ -1,0 +1,132 @@
+.stage {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: var(--screen);
+  border-radius: var(--radius-stage);
+  overflow: hidden;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5) inset, 0 18px 40px -18px rgba(13, 16, 23, 0.55);
+  color: #fff;
+}
+
+.stage:fullscreen {
+  border-radius: 0;
+  aspect-ratio: auto;
+}
+
+.video {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  background: var(--screen);
+}
+
+.bigPlay {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  border: 0;
+  background: rgba(247, 248, 250, 0.94);
+  color: var(--ink);
+  display: grid;
+  place-items: center;
+  transition: transform 0.15s ease;
+}
+
+.bigPlay:hover {
+  transform: scale(1.06);
+}
+
+.bigPlay svg {
+  width: 26px;
+  height: 26px;
+}
+
+.controls {
+  position: absolute;
+  inset: auto 0 0 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 28px 14px 12px;
+  background: linear-gradient(to top, rgba(13, 16, 23, 0.85), rgba(13, 16, 23, 0));
+}
+
+.iconButton {
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #fff;
+  display: grid;
+  place-items: center;
+  flex: none;
+}
+
+.iconButton:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.clock {
+  font-size: 13px;
+  white-space: nowrap;
+  flex: none;
+}
+
+.clockTotal {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.scrubber {
+  --played: 0%;
+  flex: 1;
+  min-width: 0;
+  height: 18px;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.scrubber::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(to right, #fff var(--played), rgba(255, 255, 255, 0.28) var(--played));
+}
+
+.scrubber::-moz-range-track {
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.scrubber::-moz-range-progress {
+  height: 4px;
+  border-radius: 2px;
+  background: #fff;
+}
+
+.scrubber::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  margin-top: -5px;
+  border-radius: 50%;
+  background: #fff;
+  border: 0;
+}
+
+.scrubber::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  border: 0;
+}
+
+.stage :focus-visible {
+  outline-color: #fff;
+}

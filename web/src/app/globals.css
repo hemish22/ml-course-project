@@ -1,0 +1,68 @@
+:root {
+  --paper: #eceef1;
+  --paper-raised: #f7f8fa;
+  --ink: #141821;
+  --ink-soft: #4b5361;
+  --ink-faint: #8b93a1;
+  --line: #d5d9e0;
+  --screen: #0d1017;
+  --screen-line: #262c38;
+  --picture: #2b55f0; /* the picture channel: CLIP frame similarity */
+  --speech: #f0a400; /* the speech channel: Whisper transcript similarity */
+  --picture-soft: #dfe6fd;
+  --speech-soft: #fdeecb;
+  --danger: #b3261e;
+  --radius-stage: 16px;
+  --radius-card: 10px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: light;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 2px solid var(--picture);
+  outline-offset: 2px;
+}
+
+.time {
+  font-family: var(--font-time), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
