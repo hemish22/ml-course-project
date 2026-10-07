@@ -100,30 +100,48 @@ from them. One row is one (query, second of video).
 - **Data:** 9 public-domain NASA episodes (about 45 min) and 86 hand-written queries, each
   with the time interval of its true answer (`benchmark/queries.json`). Intervals were
   derived from transcripts, so labels lean toward speech. 28,900 rows; 8.3% are positive.
-- **Features (15):** raw and normalized picture and speech similarity, per-video z-scores
-  and ranks, +/-2 s smoothed scores, frame-to-frame change, speech present, position in the
-  video, query length, and the hand-set fused score.
+- **Features (31):** 15 original (raw and normalized picture and speech similarity, per-video
+  z-scores and ranks, +/-2 s smoothed scores, frame-to-frame change, speech present, position,
+  query length, the hand-set fused score) plus 16 context features (+/-5 s and +/-10 s windows,
+  distance in seconds to each score's peak and the score relative to that peak, local rank,
+  scene cuts nearby, overlap between query words and spoken words).
 - **Targets:** regression, graded relevance (1 inside the true interval, decaying with
   distance); classification, is the second inside the true interval.
 - **Models:** regression: Ridge, Random forest, Gradient boosting. Classification: Logistic
   regression, k-nearest neighbours, Gradient boosting. Each is compared with a mean/prior baseline.
 - **Protocol:** leave-one-video-out (every prediction comes from models that never saw that
-  video); hyper-parameters tuned by grouped CV on the training videos only; the F1 threshold
-  also chosen on training videos only.
+  video). Hyper-parameters, the width of the temporal smoothing applied to each model's output,
+  and the F1 threshold are all chosen on the training videos only.
 
 | Regression (mean over 9 held-out videos) | RMSE | MAE | R² |
 |---|---|---|---|
 | Mean baseline | 0.319 | 0.204 | -0.03 |
-| Ridge | 0.245 | 0.153 | 0.39 |
-| Random forest | 0.240 | 0.130 | 0.41 |
-| Gradient boosting | 0.237 | 0.128 | 0.42 |
+| Ridge | 0.198 | 0.129 | 0.59 |
+| Random forest | 0.154 | 0.069 | **0.74** |
+| Gradient boosting | 0.154 | 0.070 | **0.74** |
 
-| Classification | Precision | Recall | F1 | ROC-AUC | PR-AUC |
-|---|---|---|---|---|---|
-| Prior baseline | 0.00 | 0.00 | 0.00 | 0.50 | 0.10 |
-| Logistic regression | 0.72 | 0.61 | 0.65 | 0.94 | 0.75 |
-| k-nearest neighbours | 0.65 | 0.60 | 0.62 | 0.92 | 0.69 |
-| Gradient boosting | 0.68 | 0.62 | 0.64 | 0.93 | 0.72 |
+| Classification (mean over 9 held-out videos) | Precision | Recall | F1 | Balanced acc. | ROC-AUC | PR-AUC |
+|---|---|---|---|---|---|---|
+| Prior baseline | 0.00 | 0.00 | 0.00 | 0.50 | 0.50 | 0.10 |
+| Logistic regression | 0.73 | 0.81 | **0.76** | 0.89 | 0.98 | **0.85** |
+| k-nearest neighbours | 0.69 | 0.82 | 0.74 | 0.89 | 0.98 | 0.81 |
+| Gradient boosting | 0.71 | 0.81 | 0.75 | 0.88 | 0.98 | 0.83 |
+
+Pooled over all held-out seconds, classification accuracy is 95.7% (logistic), 95.3% (gradient
+boosting) and 95.1% (kNN). Accuracy alone is not the headline metric: always answering "not in
+the moment" already scores 91.7% because only 8.3% of seconds are positive.
+
+**What improved the models** (all numbers pooled, held-out videos; the first rows were re-run
+from scratch and reproduce the earlier results):
+
+| Variant | Regression R² (RF) | Logistic F1 | Logistic PR-AUC | Logistic Hit@1 |
+|---|---|---|---|---|
+| Original 15 features | 0.39 | 0.64 | 0.70 | 0.91 |
+| + context features | 0.70 | 0.75 | 0.82 | 0.92 |
+| + temporal smoothing of outputs | 0.72 | 0.75 | 0.82 | 0.93 |
+
+Almost all of the gain comes from the context features; smoothing adds a little. For regression
+every fold picked the widest smoothing width offered (15 s), so a wider option may help slightly.
 
 Ranking seconds of each held-out query (86 queries; Hit@k = a true second is among the
 top k; 95% bootstrap interval over queries in brackets):
@@ -134,31 +152,30 @@ top k; 95% bootstrap interval over queries in brackets):
 | Picture only | 0.60 (0.50–0.71) | 0.85 | 0.71 |
 | Speech only | 0.90 (0.83–0.95) | 0.92 | 0.91 |
 | Hand-set fusion (α = 0.6) | 0.87 (0.80–0.94) | 0.97 | 0.91 |
-| Ridge regression | 0.91 (0.84–0.97) | 0.95 | 0.93 |
-| Random forest regression | 0.87 (0.79–0.94) | 0.94 | 0.90 |
-| Gradient boosting regression | 0.91 (0.84–0.97) | 0.97 | 0.93 |
-| Logistic regression | 0.91 (0.84–0.97) | 0.97 | 0.93 |
-| k-nearest neighbours | 0.91 (0.85–0.97) | 0.95 | 0.92 |
-| Gradient boosting classifier | 0.86 (0.78–0.93) | 0.94 | 0.89 |
+| Ridge regression | 0.93 (0.87–0.98) | 0.94 | 0.94 |
+| Random forest regression | 0.92 (0.85–0.97) | 0.94 | 0.93 |
+| Gradient boosting regression | 0.91 (0.84–0.97) | 0.94 | 0.92 |
+| Logistic regression | 0.93 (0.87–0.98) | 0.94 | 0.94 |
+| k-nearest neighbours | 0.91 (0.84–0.97) | 0.94 | 0.93 |
+| Gradient boosting classifier | 0.92 (0.86–0.98) | 0.94 | 0.93 |
 
 **Findings.**
-1. All six models clearly beat their baselines, so the engineered features carry real signal.
-2. The models are within one standard deviation of each other across videos; a linear model is
-   nearly as good as the ensembles. Smoothed and per-video z-scored scores matter most, raw
-   similarity least.
-3. Used to rank seconds, the learned models reach Hit@1 of 0.86 to 0.91 against 0.87 for hand-set
-   fusion, 0.60 for picture only and 0.90 for speech only. The 95% intervals (about +/-0.07)
-   overlap, so **learned ranking does not clearly beat hand-set fusion on this benchmark**.
+1. All six models clearly beat their baselines. With context features, regression reaches R² of
+   0.74 and classification F1 of 0.76, PR-AUC 0.85 and balanced accuracy 0.89.
+2. Context matters more than the model: distance to the speech peak, wider windows and per-video
+   z-scores are the most important features; raw similarity is least. Random forest and gradient
+   boosting tie; the linear model is clearly worse for regression but about equal for classification.
+3. Learned rankers put a true second first in 91 to 93% of queries versus 87% for hand-set fusion.
+   The direction is consistent but the 95% intervals (about +/-0.07) overlap, so the improvement
+   is **not statistically established** on 86 queries.
 4. Speech-only matches fusion partly because labels were written from transcripts.
+5. Held-out scores keep improving as training videos are added (logistic PR-AUC 0.79 with one
+   video, 0.85 with six), with diminishing returns, so more labeled videos would likely help.
 
-Learning curves flatten after about two training videos for regression and rise slowly for
-classification, with wide spread across videos, so differences between models are small
-relative to video-to-video variation.
-
-18 charts (class balance, feature distributions, correlations, predicted vs actual, residuals,
+19 charts (class balance, feature distributions, correlations, predicted vs actual, residuals,
 confusion matrices, ROC, precision-recall, importances, learning curves, thresholds, retrieval
-comparison, alpha sweep, per-video results) are in `results/ml/figures/`; tables are in
-`results/ml/`; `notebooks/analysis.ipynb` walks through them.
+comparison, alpha sweep, per-video results, and the improvement ablation) are in
+`results/ml/figures/`; tables are in `results/ml/`; `notebooks/analysis.ipynb` walks through them.
 
 ## 6. Evaluation status
 
@@ -184,12 +201,11 @@ Section 5 reports retrieval results on our own labeled benchmark instead.
 - **CPU only on Apple Silicon.** The code uses a GPU only when CUDA is present.
 - **Speech quality limits speech search.** Whisper `base` mishears names and jargon.
 - **Small, biased labeled set.** The supervised analysis uses 86 queries over 9 videos from one
-  content domain (NASA news), with labels derived from transcripts. Confidence intervals are wide
+  content domain (NASA news), with labels derived from transcripts. Confidence intervals are wide (R² varies by about +/-0.13 across videos)
   and the labels favour speech. A benchmark labeled by watching the picture, more videos, and
   other domains (lectures, sports, silent footage) are the next steps.
-- **Learned ranking is not clearly better than hand-set fusion** on this data (section 5). The
-  models do show the features carry signal, and that smoothed, per-video-calibrated scores are
-  what matter.
+- **Learned ranking beats hand-set fusion by a few points, but not significantly** on this data
+  (section 5). The models show the engineered context features carry strong signal.
 - **Not run on MSR-VTT or Charades yet** (section 6).
 
 ## 8. Run it
@@ -201,10 +217,10 @@ python scripts/fetch_demo.py              # optional demo video
 uvicorn server.main:app --port 8000
 cd web && npm install && npm run dev      # http://localhost:3000
 
-# regression / classification analysis (about 10 minutes)
+# regression / classification analysis (about 20 minutes on a laptop; folds run in parallel)
 python scripts/fetch_benchmark.py         # needs yt-dlp; 7 more episodes
 python scripts/ingest.py --dir data/raw
-python scripts/run_analysis.py            # tables and 18 charts in results/ml/
+python scripts/run_analysis.py            # tables and 19 charts in results/ml/
 pytest                                    # 44 tests
 ```
 

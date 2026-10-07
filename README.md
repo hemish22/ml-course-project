@@ -59,11 +59,11 @@ frozen pipeline to predict, for every second of a video, how relevant it is to a
 ```bash
 python scripts/fetch_benchmark.py            # needs yt-dlp; downloads 7 public-domain episodes
 python scripts/ingest.py --dir data/raw      # index them (about 5 minutes)
-python scripts/run_analysis.py               # features -> 6 models -> tables -> 18 charts
+python scripts/run_analysis.py               # features -> 6 models -> tables -> 19 charts
 ```
 
-Labels are in `benchmark/queries.json`. The run takes about 10 minutes
-(leave-one-video-out with hyper-parameter search); `--step plots` redraws charts only.
+Labels are in `benchmark/queries.json`. The run takes roughly 10 to 20 minutes
+(leave-one-video-out with hyper-parameter search; folds run in parallel, see `ml.n_jobs`); `--step plots` redraws charts only.
 
 ## Evaluation
 
