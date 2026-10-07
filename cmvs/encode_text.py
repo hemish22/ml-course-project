@@ -26,6 +26,12 @@ def _load_text_model(cfg: object) -> Any:
     return _TEXT_MODEL
 
 
+def _embedding_dim(model: Any) -> int:
+    """Return embedding width across sentence-transformers API renames."""
+    getter = getattr(model, "get_embedding_dimension", None) or model.get_sentence_embedding_dimension
+    return getter()
+
+
 def _encode_texts(texts: list[str], model: Any) -> np.ndarray:
     """Embed text with a sentence-transformer and enforce vector normalization."""
     embeddings = model.encode(texts, convert_to_numpy=True, normalize_embeddings=False)
@@ -44,7 +50,7 @@ def encode_segments(texts: list[str], cfg: object) -> np.ndarray:
     """
     model = _load_text_model(cfg)
     if not texts:
-        return np.empty((0, int(model.get_sentence_embedding_dimension())), dtype=np.float32)
+        return np.empty((0, int(_embedding_dim(model))), dtype=np.float32)
     return _encode_texts(texts, model)
 
 

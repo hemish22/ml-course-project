@@ -3,8 +3,12 @@
 from __future__ import annotations
 
 import argparse
+import os
 from pathlib import Path
 import sys
+
+if sys.platform == "darwin":  # faiss + torch each bundle libomp and segfault together
+    os.environ.setdefault("OMP_NUM_THREADS", "1")
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 

@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 import json
 from pathlib import Path
-from typing import Any
+from typing import Callable
 
 from cmvs.encode_text import encode_segments
 from cmvs.encode_visual import encode_images
@@ -58,17 +58,28 @@ def _write_video_meta(
         json.dump(meta, meta_file, ensure_ascii=False)
 
 
-def ingest(video_path: Path, cfg: object, force: bool = False) -> str:
+def ingest(
+    video_path: Path,
+    cfg: object,
+    force: bool = False,
+    on_stage: Callable[[str], None] | None = None,
+) -> str:
     """Extract, embed, and index a video, skipping completed stages by default.
 
     Args:
         video_path: Source video path.
         cfg: Application configuration.
         force: Rebuild every artifact even if its output already exists.
+        on_stage: Optional callback told which stage is starting: ``frames``,
+            ``speech``, ``picture``, ``text`` or ``finish``.
 
     Returns:
         Stable video identifier derived from the source filename.
     """
+    def announce(stage: str) -> None:
+        if on_stage is not None:
+            on_stage(stage)
+
     video_id = slugify(video_path.name)
     processed_dir = cfg.paths.processed / video_id
     index_dir = cfg.paths.index / video_id
@@ -87,11 +98,13 @@ def ingest(video_path: Path, cfg: object, force: bool = False) -> str:
     if is_complete and not force:
         return video_id
 
+    announce("frames")
     if frame_manifest.exists() and not force:
         frames = read_jsonl(frame_manifest)
     else:
         frames = extract_frames(video_path, processed_dir, cfg)
 
+    announce("speech")
     if transcript_manifest.exists() and not force:
         segments = read_jsonl(transcript_manifest)
     else:
@@ -103,6 +116,7 @@ def ingest(video_path: Path, cfg: object, force: bool = False) -> str:
         segments = transcribe(audio_for_transcription, cfg) if audio_for_transcription else []
         write_jsonl(transcript_manifest, segments)
 
+    announce("picture")
     if force or not _index_exists(index_dir, "visual"):
         visual_vectors = encode_images([row["path"] for row in frames], cfg)
         save_index(
@@ -116,6 +130,7 @@ def ingest(video_path: Path, cfg: object, force: bool = False) -> str:
             "visual",
         )
 
+    announce("text")
     if force or not _index_exists(index_dir, "transcript"):
         transcript_vectors = encode_segments([row["text"] for row in segments], cfg)
         save_index(
@@ -130,6 +145,7 @@ def ingest(video_path: Path, cfg: object, force: bool = False) -> str:
             "transcript",
         )
 
+    announce("finish")
     if force or not meta_path.exists():
         try:
             duration = probe_duration(video_path)

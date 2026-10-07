@@ -49,10 +49,22 @@ def _overlapping_text(meta: dict[str, Any], start: float, end: float) -> str:
     )
 
 
-def search_video(
+@dataclass(frozen=True)
+class ScoreTimeline:
+    """Calibrated per-frame scores for one query over one video."""
+
+    timestamps: np.ndarray
+    visual: np.ndarray
+    transcript: np.ndarray
+    fused: np.ndarray
+    visual_meta: dict[str, Any]
+    transcript_meta: dict[str, Any]
+
+
+def score_video(
     query: str, video_id: str, cfg: object, alpha: float | None = None
-) -> list[Moment]:
-    """Search one indexed video and return its ranked fused moments.
+) -> ScoreTimeline:
+    """Score every frame of one indexed video against a query.
 
     Args:
         query: Natural-language search query.
@@ -61,14 +73,15 @@ def search_video(
         alpha: Optional override for the configured visual fusion weight.
 
     Returns:
-        Ranked timestamped search moments.
+        Min-max-normalized visual and transcript scores plus their fusion.
     """
     index_dir = Path(cfg.paths.index) / video_id
     visual_index, visual_meta = load_index(index_dir, "visual")
     transcript_index, transcript_meta = load_index(index_dir, "transcript")
     frame_timestamps = np.asarray(visual_meta["timestamp"], dtype=np.float32)
     if frame_timestamps.size == 0:
-        return []
+        empty = np.empty(0, dtype=np.float32)
+        return ScoreTimeline(frame_timestamps, empty, empty, empty, visual_meta, transcript_meta)
 
     visual_scores, visual_ids = search_index(
         visual_index,
@@ -96,11 +109,25 @@ def search_video(
     normalized_visual = minmax_normalize(dense_visual)
     normalized_transcript = minmax_normalize(aligned_transcript)
     selected_alpha = cfg.search.alpha if alpha is None else alpha
-    grouped = group_frames_into_moments(
+    return ScoreTimeline(
         frame_timestamps,
-        fuse_scores(normalized_visual, normalized_transcript, selected_alpha),
         normalized_visual,
         normalized_transcript,
+        fuse_scores(normalized_visual, normalized_transcript, selected_alpha),
+        visual_meta,
+        transcript_meta,
+    )
+
+
+def moments_from_timeline(timeline: ScoreTimeline, video_id: str, cfg: object) -> list[Moment]:
+    """Group a score timeline into ranked, timestamped moments."""
+    if timeline.timestamps.size == 0:
+        return []
+    grouped = group_frames_into_moments(
+        timeline.timestamps,
+        timeline.fused,
+        timeline.visual,
+        timeline.transcript,
         cfg,
     )
     return [
@@ -111,11 +138,28 @@ def search_video(
             score=moment["score"],
             visual_score=moment["visual_score"],
             transcript_score=moment["transcript_score"],
-            thumbnail_path=visual_meta["path"][moment["peak_idx"]],
-            transcript_text=_overlapping_text(transcript_meta, moment["start"], moment["end"]),
+            thumbnail_path=timeline.visual_meta["path"][moment["peak_idx"]],
+            transcript_text=_overlapping_text(timeline.transcript_meta, moment["start"], moment["end"]),
         )
         for moment in grouped
     ]
+
+
+def search_video(
+    query: str, video_id: str, cfg: object, alpha: float | None = None
+) -> list[Moment]:
+    """Search one indexed video and return its ranked fused moments.
+
+    Args:
+        query: Natural-language search query.
+        video_id: Indexed video identifier.
+        cfg: Application configuration.
+        alpha: Optional override for the configured visual fusion weight.
+
+    Returns:
+        Ranked timestamped search moments.
+    """
+    return moments_from_timeline(score_video(query, video_id, cfg, alpha), video_id, cfg)
 
 
 def search_library(query: str, cfg: object, alpha: float | None = None) -> list[Moment]:

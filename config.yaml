@@ -24,7 +24,7 @@ encode:
 search:
   alpha: 0.6
   top_k_frames: 200
-  score_threshold: 0.28
+  score_threshold: 0.5
   merge_gap_s: 2.0
   min_moment_s: 1.0
   max_results: 10
