@@ -50,6 +50,21 @@ Set `NEXT_PUBLIC_API_URL` in `web/.env.local` if the API is not on
 `http://localhost:8000`. On macOS the entry points set `OMP_NUM_THREADS=1`
 because FAISS and PyTorch otherwise crash on duplicate OpenMP runtimes.
 
+## Regression and classification analysis
+
+Three regression and three classification models are trained on features from the
+frozen pipeline to predict, for every second of a video, how relevant it is to a query
+(`analysis/`, results in `results/ml/`, walkthrough in `notebooks/analysis.ipynb`).
+
+```bash
+python scripts/fetch_benchmark.py            # needs yt-dlp; downloads 7 public-domain episodes
+python scripts/ingest.py --dir data/raw      # index them (about 5 minutes)
+python scripts/run_analysis.py               # features -> 6 models -> tables -> 18 charts
+```
+
+Labels are in `benchmark/queries.json`. The run takes about 10 minutes
+(leave-one-video-out with hyper-parameter search); `--step plots` redraws charts only.
+
 ## Evaluation
 
 The evaluation code intentionally does **not** download MSR-VTT or Charades.

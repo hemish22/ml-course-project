@@ -7,9 +7,11 @@ Needle finds moments inside a video from a plain-language query. You type
 clips. It matches the query against both **what is shown** (the pictures) and
 **what is said** (the speech), then combines the two.
 
-No model is trained or fine-tuned. Three pretrained, frozen models are used. The
-work is in the pipeline, the way the two signals are aligned in time and fused,
-and the app built on top.
+The three encoders (CLIP, Whisper, MiniLM) are pretrained and never trained or
+fine-tuned. The work is in the pipeline, the way the two signals are aligned in time
+and fused, and the app built on top. Section 5 adds six small supervised models
+(three regression, three classification) trained on features extracted from the
+frozen encoders, to test whether a learned score can replace the hand-set fusion.
 
 **Why two signals?** Pictures alone miss things that are only spoken ("advice for
 becoming an astronaut"). Speech alone misses things that are only seen (a rover
@@ -81,7 +83,7 @@ Measured on an Apple M4 laptop, CPU only:
 | Upload and index a 3:48 video | 22 s end to end |
 | Re-ingest a finished video | under 1 s |
 | Search latency | about 25–120 ms |
-| Automated tests | 36 passing (fusion, grouping, index, pipeline, API, upload, ranges) |
+| Automated tests | 44 passing (fusion, grouping, index, pipeline, API, upload, byte ranges, benchmark labels, features, cross-validation) |
 
 Qualitative check on a public-domain NASA news episode: "baseball first pitch"
 returns the 10:16 ceremonial pitch first; "Mars rover robotic arm" returns the
@@ -89,7 +91,76 @@ returns the 10:16 ceremonial pitch first; "Mars rover robotic arm" returns the
 narration says it. Moving the slider to speech-only or picture-only changes the
 ranking as expected.
 
-## 5. Evaluation status
+## 5. Regression and classification analysis
+
+**Goal.** Replace the hand-set fusion weight with models learned from labeled examples.
+The encoders stay frozen; six small scikit-learn models are trained on features computed
+from them. One row is one (query, second of video).
+
+- **Data:** 9 public-domain NASA episodes (about 45 min) and 86 hand-written queries, each
+  with the time interval of its true answer (`benchmark/queries.json`). Intervals were
+  derived from transcripts, so labels lean toward speech. 28,900 rows; 8.3% are positive.
+- **Features (15):** raw and normalized picture and speech similarity, per-video z-scores
+  and ranks, +/-2 s smoothed scores, frame-to-frame change, speech present, position in the
+  video, query length, and the hand-set fused score.
+- **Targets:** regression, graded relevance (1 inside the true interval, decaying with
+  distance); classification, is the second inside the true interval.
+- **Models:** regression: Ridge, Random forest, Gradient boosting. Classification: Logistic
+  regression, k-nearest neighbours, Gradient boosting. Each is compared with a mean/prior baseline.
+- **Protocol:** leave-one-video-out (every prediction comes from models that never saw that
+  video); hyper-parameters tuned by grouped CV on the training videos only; the F1 threshold
+  also chosen on training videos only.
+
+| Regression (mean over 9 held-out videos) | RMSE | MAE | R² |
+|---|---|---|---|
+| Mean baseline | 0.319 | 0.204 | -0.03 |
+| Ridge | 0.245 | 0.153 | 0.39 |
+| Random forest | 0.240 | 0.130 | 0.41 |
+| Gradient boosting | 0.237 | 0.128 | 0.42 |
+
+| Classification | Precision | Recall | F1 | ROC-AUC | PR-AUC |
+|---|---|---|---|---|---|
+| Prior baseline | 0.00 | 0.00 | 0.00 | 0.50 | 0.10 |
+| Logistic regression | 0.72 | 0.61 | 0.65 | 0.94 | 0.75 |
+| k-nearest neighbours | 0.65 | 0.60 | 0.62 | 0.92 | 0.69 |
+| Gradient boosting | 0.68 | 0.62 | 0.64 | 0.93 | 0.72 |
+
+Ranking seconds of each held-out query (86 queries; Hit@k = a true second is among the
+top k; 95% bootstrap interval over queries in brackets):
+
+| Method | Hit@1 | Hit@5 | MRR |
+|---|---|---|---|
+| Random | 0.08 (0.07–0.10) | 0.37 | 0.23 |
+| Picture only | 0.60 (0.50–0.71) | 0.85 | 0.71 |
+| Speech only | 0.90 (0.83–0.95) | 0.92 | 0.91 |
+| Hand-set fusion (α = 0.6) | 0.87 (0.80–0.94) | 0.97 | 0.91 |
+| Ridge regression | 0.91 (0.84–0.97) | 0.95 | 0.93 |
+| Random forest regression | 0.87 (0.79–0.94) | 0.94 | 0.90 |
+| Gradient boosting regression | 0.91 (0.84–0.97) | 0.97 | 0.93 |
+| Logistic regression | 0.91 (0.84–0.97) | 0.97 | 0.93 |
+| k-nearest neighbours | 0.91 (0.85–0.97) | 0.95 | 0.92 |
+| Gradient boosting classifier | 0.86 (0.78–0.93) | 0.94 | 0.89 |
+
+**Findings.**
+1. All six models clearly beat their baselines, so the engineered features carry real signal.
+2. The models are within one standard deviation of each other across videos; a linear model is
+   nearly as good as the ensembles. Smoothed and per-video z-scored scores matter most, raw
+   similarity least.
+3. Used to rank seconds, the learned models reach Hit@1 of 0.86 to 0.91 against 0.87 for hand-set
+   fusion, 0.60 for picture only and 0.90 for speech only. The 95% intervals (about +/-0.07)
+   overlap, so **learned ranking does not clearly beat hand-set fusion on this benchmark**.
+4. Speech-only matches fusion partly because labels were written from transcripts.
+
+Learning curves flatten after about two training videos for regression and rise slowly for
+classification, with wide spread across videos, so differences between models are small
+relative to video-to-video variation.
+
+18 charts (class balance, feature distributions, correlations, predicted vs actual, residuals,
+confusion matrices, ROC, precision-recall, importances, learning curves, thresholds, retrieval
+comparison, alpha sweep, per-video results) are in `results/ml/figures/`; tables are in
+`results/ml/`; `notebooks/analysis.ipynb` walks through them.
+
+## 6. Evaluation status
 
 The harness is implemented (`eval/`): MSR-VTT clip retrieval (Recall@1/5/10,
 median rank; mean vs max frame pooling), Charades moment retrieval (R@1 at
@@ -98,9 +169,10 @@ pooling, ViT-B/32 vs ViT-L/14) with the α-sweep plot. It is unit-tested on
 synthetic data.
 
 **It has not been run on MSR-VTT or Charades**, so this report contains no
-benchmark numbers. Those datasets must be obtained under their own licenses.
+results on those benchmarks (those datasets must be obtained under their own licenses).
+Section 5 reports retrieval results on our own labeled benchmark instead.
 
-## 6. Limitations and next steps
+## 7. Limitations and next steps
 
 - **Top result is always about 1.0.** Min-max normalization is relative to each
   query, so the best moment always scores 1.0, even when nothing truly matches.
@@ -111,9 +183,16 @@ benchmark numbers. Those datasets must be obtained under their own licenses.
 - **One frame per second** can miss fast events and rounds clip edges to whole seconds.
 - **CPU only on Apple Silicon.** The code uses a GPU only when CUDA is present.
 - **Speech quality limits speech search.** Whisper `base` mishears names and jargon.
-- **Not run on the benchmarks yet** (section 5). That is the main next step.
+- **Small, biased labeled set.** The supervised analysis uses 86 queries over 9 videos from one
+  content domain (NASA news), with labels derived from transcripts. Confidence intervals are wide
+  and the labels favour speech. A benchmark labeled by watching the picture, more videos, and
+  other domains (lectures, sports, silent footage) are the next steps.
+- **Learned ranking is not clearly better than hand-set fusion** on this data (section 5). The
+  models do show the features carry signal, and that smoothed, per-video-calibrated scores are
+  what matter.
+- **Not run on MSR-VTT or Charades yet** (section 6).
 
-## 7. Run it
+## 8. Run it
 
 ```bash
 python -m venv .venv && source .venv/bin/activate
@@ -121,7 +200,14 @@ pip install -r requirements.txt           # also needs ffmpeg on PATH
 python scripts/fetch_demo.py              # optional demo video
 uvicorn server.main:app --port 8000
 cd web && npm install && npm run dev      # http://localhost:3000
+
+# regression / classification analysis (about 10 minutes)
+python scripts/fetch_benchmark.py         # needs yt-dlp; 7 more episodes
+python scripts/ingest.py --dir data/raw
+python scripts/run_analysis.py            # tables and 18 charts in results/ml/
+pytest                                    # 44 tests
 ```
 
-Code: `cmvs/` (pipeline), `server/` (API), `web/` (frontend), `eval/` (benchmarks),
-`tests/`. Settings live in `config.yaml`.
+Code: `cmvs/` (pipeline), `server/` (API), `web/` (frontend), `analysis/` (regression and
+classification), `eval/` (benchmarks), `benchmark/` (labels), `notebooks/`, `tests/`. Settings
+live in `config.yaml`.
