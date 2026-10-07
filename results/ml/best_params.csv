@@ -1,0 +1,55 @@
+fold_video,task,model,params,inner_cv_score
+a-remote-possibility,regression,ridge,{'model__alpha': 100.0},-0.24541737854124612
+a-remote-possibility,regression,random_forest,"{'model__max_depth': 12, 'model__min_samples_leaf': 20, 'model__n_estimators': 200}",-0.24631096962968402
+a-remote-possibility,regression,gradient_boosting,"{'model__learning_rate': 0.05, 'model__max_depth': 3, 'model__max_iter': 200}",-0.24377772596732383
+a-remote-possibility,classification,logistic,{'model__C': 1.0},0.7060901846534869
+a-remote-possibility,classification,knn,{'model__n_neighbors': 151},0.6190254570246414
+a-remote-possibility,classification,gradient_boosting,"{'model__learning_rate': 0.05, 'model__max_depth': 3, 'model__max_iter': 200}",0.6510247175613268
+administrator-chats-astronauts,regression,ridge,{'model__alpha': 100.0},-0.22942437732659451
+administrator-chats-astronauts,regression,random_forest,"{'model__max_depth': 12, 'model__min_samples_leaf': 20, 'model__n_estimators': 200}",-0.22819366188269152
+administrator-chats-astronauts,regression,gradient_boosting,"{'model__learning_rate': 0.05, 'model__max_depth': 3, 'model__max_iter': 200}",-0.2259160520224759
+administrator-chats-astronauts,classification,logistic,{'model__C': 10.0},0.7089584056473307
+administrator-chats-astronauts,classification,knn,{'model__n_neighbors': 151},0.627351173729629
+administrator-chats-astronauts,classification,gradient_boosting,"{'model__learning_rate': 0.05, 'model__max_depth': 3, 'model__max_iter': 200}",0.6369697639441352
+commercial-crew-milestone,regression,ridge,{'model__alpha': 100.0},-0.23225447578659608
+commercial-crew-milestone,regression,random_forest,"{'model__max_depth': 12, 'model__min_samples_leaf': 20, 'model__n_estimators': 200}",-0.23016551886618766
+commercial-crew-milestone,regression,gradient_boosting,"{'model__learning_rate': 0.05, 'model__max_depth': 3, 'model__max_iter': 200}",-0.23149054481926776
+commercial-crew-milestone,classification,logistic,{'model__C': 10.0},0.7012444478786909
+commercial-crew-milestone,classification,knn,{'model__n_neighbors': 151},0.6197169479656294
+commercial-crew-milestone,classification,gradient_boosting,"{'model__learning_rate': 0.05, 'model__max_depth': 3, 'model__max_iter': 200}",0.6391482534299943
+cosmic-phenomenon,regression,ridge,{'model__alpha': 100.0},-0.22820399086784918
+cosmic-phenomenon,regression,random_forest,"{'model__max_depth': 12, 'model__min_samples_leaf': 20, 'model__n_estimators': 200}",-0.22637606110040945
+cosmic-phenomenon,regression,gradient_boosting,"{'model__learning_rate': 0.05, 'model__max_depth': 3, 'model__max_iter': 200}",-0.22440873047883492
+cosmic-phenomenon,classification,logistic,{'model__C': 10.0},0.7078652631228293
+cosmic-phenomenon,classification,knn,{'model__n_neighbors': 151},0.6115998784006352
+cosmic-phenomenon,classification,gradient_boosting,"{'model__learning_rate': 0.05, 'model__max_depth': 3, 'model__max_iter': 200}",0.6436514943637989
+hubble-exoplanet,regression,ridge,{'model__alpha': 100.0},-0.2306866699154058
+hubble-exoplanet,regression,random_forest,"{'model__max_depth': 12, 'model__min_samples_leaf': 20, 'model__n_estimators': 200}",-0.22950233814033405
+hubble-exoplanet,regression,gradient_boosting,"{'model__learning_rate': 0.05, 'model__max_depth': 3, 'model__max_iter': 200}",-0.22691430910072444
+hubble-exoplanet,classification,logistic,{'model__C': 1.0},0.6951374786379297
+hubble-exoplanet,classification,knn,{'model__n_neighbors': 151},0.6062965850933663
+hubble-exoplanet,classification,gradient_boosting,"{'model__learning_rate': 0.05, 'model__max_depth': 3, 'model__max_iter': 200}",0.6381504105153986
+mars-mission-briefed,regression,ridge,{'model__alpha': 100.0},-0.23077672988259332
+mars-mission-briefed,regression,random_forest,"{'model__max_depth': 12, 'model__min_samples_leaf': 20, 'model__n_estimators': 200}",-0.23088784288570488
+mars-mission-briefed,regression,gradient_boosting,"{'model__learning_rate': 0.05, 'model__max_depth': 3, 'model__max_iter': 200}",-0.22889558242828897
+mars-mission-briefed,classification,logistic,{'model__C': 1.0},0.6987459614375404
+mars-mission-briefed,classification,knn,{'model__n_neighbors': 151},0.6085052739484507
+mars-mission-briefed,classification,gradient_boosting,"{'model__learning_rate': 0.05, 'model__max_depth': 3, 'model__max_iter': 200}",0.6279817209944057
+new-explorers-new-roadmap,regression,ridge,{'model__alpha': 100.0},-0.2318870956728835
+new-explorers-new-roadmap,regression,random_forest,"{'model__max_depth': 12, 'model__min_samples_leaf': 20, 'model__n_estimators': 200}",-0.23206586824014155
+new-explorers-new-roadmap,regression,gradient_boosting,"{'model__learning_rate': 0.05, 'model__max_depth': 3, 'model__max_iter': 200}",-0.22963511459664496
+new-explorers-new-roadmap,classification,logistic,{'model__C': 10.0},0.6915674050955811
+new-explorers-new-roadmap,classification,knn,{'model__n_neighbors': 151},0.601250613628455
+new-explorers-new-roadmap,classification,gradient_boosting,"{'model__learning_rate': 0.05, 'model__max_depth': 3, 'model__max_iter': 200}",0.636920888071902
+smoke-and-fire,regression,ridge,{'model__alpha': 100.0},-0.23190818556067602
+smoke-and-fire,regression,random_forest,"{'model__max_depth': 12, 'model__min_samples_leaf': 20, 'model__n_estimators': 200}",-0.23344875370861295
+smoke-and-fire,regression,gradient_boosting,"{'model__learning_rate': 0.05, 'model__max_depth': 3, 'model__max_iter': 200}",-0.22972203403468092
+smoke-and-fire,classification,logistic,{'model__C': 0.1},0.6801931199145059
+smoke-and-fire,classification,knn,{'model__n_neighbors': 151},0.5954247544173864
+smoke-and-fire,classification,gradient_boosting,"{'model__learning_rate': 0.05, 'model__max_depth': 3, 'model__max_iter': 200}",0.6186913714024437
+this-week-at-nasa,regression,ridge,{'model__alpha': 10.0},-0.23428255044931143
+this-week-at-nasa,regression,random_forest,"{'model__max_depth': 6, 'model__min_samples_leaf': 5, 'model__n_estimators': 200}",-0.23002470204227213
+this-week-at-nasa,regression,gradient_boosting,"{'model__learning_rate': 0.05, 'model__max_depth': 3, 'model__max_iter': 200}",-0.22751592258224115
+this-week-at-nasa,classification,logistic,{'model__C': 10.0},0.7479267276414049
+this-week-at-nasa,classification,knn,{'model__n_neighbors': 151},0.6885833021867152
+this-week-at-nasa,classification,gradient_boosting,"{'model__learning_rate': 0.05, 'model__max_depth': 3, 'model__max_iter': 200}",0.7243182908110968

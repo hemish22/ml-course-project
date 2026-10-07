@@ -1,0 +1,46 @@
+method,video_id,hit_at_1,hit_at_5,mrr
+Fixed-weight fusion,a-remote-possibility,0.9333333333333333,1.0,0.9555555555555556
+Fixed-weight fusion,administrator-chats-astronauts,0.75,0.875,0.8125
+Fixed-weight fusion,commercial-crew-milestone,0.8888888888888888,0.8888888888888888,0.8954248366013071
+Fixed-weight fusion,cosmic-phenomenon,1.0,1.0,1.0
+Fixed-weight fusion,hubble-exoplanet,0.875,1.0,0.9375
+Fixed-weight fusion,mars-mission-briefed,0.75,1.0,0.875
+Fixed-weight fusion,new-explorers-new-roadmap,1.0,1.0,1.0
+Fixed-weight fusion,smoke-and-fire,1.0,1.0,1.0
+Fixed-weight fusion,this-week-at-nasa,0.7333333333333333,0.9333333333333333,0.8074074074074074
+Picture only,a-remote-possibility,0.5333333333333333,0.8666666666666667,0.6833333333333333
+Picture only,administrator-chats-astronauts,0.625,1.0,0.7604166666666666
+Picture only,commercial-crew-milestone,0.5555555555555556,0.8888888888888888,0.6518518518518519
+Picture only,cosmic-phenomenon,0.8,1.0,0.9
+Picture only,hubble-exoplanet,0.75,1.0,0.8375
+Picture only,mars-mission-briefed,0.25,0.75,0.48660714285714285
+Picture only,new-explorers-new-roadmap,0.6666666666666666,0.7777777777777778,0.75
+Picture only,smoke-and-fire,0.6666666666666666,0.6666666666666666,0.6992063492063492
+Picture only,this-week-at-nasa,0.6666666666666666,0.8,0.7241975308641975
+Speech only,a-remote-possibility,1.0,1.0,1.0
+Speech only,administrator-chats-astronauts,0.75,0.75,0.7864583333333333
+Speech only,commercial-crew-milestone,0.8888888888888888,0.8888888888888888,0.8933333333333332
+Speech only,cosmic-phenomenon,1.0,1.0,1.0
+Speech only,hubble-exoplanet,0.875,1.0,0.90625
+Speech only,mars-mission-briefed,0.875,0.875,0.8928571428571428
+Speech only,new-explorers-new-roadmap,1.0,1.0,1.0
+Speech only,smoke-and-fire,1.0,1.0,1.0
+Speech only,this-week-at-nasa,0.8,0.8,0.825
+Regression: Gradient boosting,a-remote-possibility,0.8666666666666667,1.0,0.9111111111111111
+Regression: Gradient boosting,administrator-chats-astronauts,0.875,1.0,0.90625
+Regression: Gradient boosting,commercial-crew-milestone,0.8888888888888888,0.8888888888888888,0.8918128654970761
+Regression: Gradient boosting,cosmic-phenomenon,1.0,1.0,1.0
+Regression: Gradient boosting,hubble-exoplanet,1.0,1.0,1.0
+Regression: Gradient boosting,mars-mission-briefed,0.875,1.0,0.9375
+Regression: Gradient boosting,new-explorers-new-roadmap,1.0,1.0,1.0
+Regression: Gradient boosting,smoke-and-fire,1.0,1.0,1.0
+Regression: Gradient boosting,this-week-at-nasa,0.8,0.8666666666666667,0.84
+Classification: Gradient boosting,a-remote-possibility,0.9333333333333333,0.9333333333333333,0.9444444444444444
+Classification: Gradient boosting,administrator-chats-astronauts,0.75,1.0,0.8
+Classification: Gradient boosting,commercial-crew-milestone,0.8888888888888888,0.8888888888888888,0.8918128654970761
+Classification: Gradient boosting,cosmic-phenomenon,1.0,1.0,1.0
+Classification: Gradient boosting,hubble-exoplanet,1.0,1.0,1.0
+Classification: Gradient boosting,mars-mission-briefed,0.75,1.0,0.875
+Classification: Gradient boosting,new-explorers-new-roadmap,1.0,1.0,1.0
+Classification: Gradient boosting,smoke-and-fire,1.0,1.0,1.0
+Classification: Gradient boosting,this-week-at-nasa,0.6,0.8,0.6761904761904761
