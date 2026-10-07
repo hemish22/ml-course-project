@@ -1,6 +1,7 @@
 # Generated video data and benchmark outputs
 data/
-results/
+results/*
+!results/ml/
 
 # Python build and test artifacts
 __pycache__/

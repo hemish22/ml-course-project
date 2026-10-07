@@ -2,7 +2,9 @@
 
 ## Project
 Cross-modal video search: CLIP frame embeddings + Whisper transcript embeddings,
-fused at query time, returning timestamped moments. No model training anywhere.
+fused at query time, returning timestamped moments. The pretrained encoders (CLIP,
+Whisper, MiniLM) are never trained. The `analysis/` package may train small
+scikit-learn regression/classification models on features extracted from them.
 
 ## Rules
 - Python 3.10. Type hints on all public functions.
@@ -15,7 +17,8 @@ fused at query time, returning timestamped moments. No model training anywhere.
 - Run `pytest` before declaring a task complete.
 
 ## Do Not
-- Do not add training loops, fine-tuning, or LoRA.
+- Do not add training loops, fine-tuning, or LoRA to the CLIP/Whisper/MiniLM encoders.
+- Trained models live only in `analysis/` (scikit-learn). `cmvs/` stays free of training code.
 - Do not swap FAISS for IVF/HNSW — the corpus is small and exact search is correct.
 - Do not import Streamlit inside the `cmvs/` package.
 - Do not add new dependencies without stating why.

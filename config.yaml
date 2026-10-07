@@ -35,3 +35,21 @@ evaluation:
   clip_models: [ViT-B-32, ViT-L-14]
   moment_iou_thresholds: [0.5, 0.7]
   plot_dpi: 200
+
+ml:
+  benchmark: benchmark/queries.json
+  seed: 42
+  baseline_alpha: 0.6        # fixed fusion weight the learned models are compared against
+  relevance_decay_s: 5.0     # graded regression label decays as exp(-distance / decay) outside the true interval
+  smooth_window: 2           # seconds either side used for neighbour-smoothed scores
+  inner_folds: 3             # grouped CV folds used for hyper-parameter search
+  permutation_repeats: 3
+  retrieval_ks: [1, 5]
+  figures_dir: results/ml/figures
+  tables_dir: results/ml
+  grids:
+    ridge: {alpha: [0.01, 0.1, 1.0, 10.0, 100.0]}
+    random_forest: {n_estimators: [200], max_depth: [6, 12], min_samples_leaf: [5, 20]}
+    gradient_boosting: {learning_rate: [0.05, 0.1], max_depth: [3, 6], max_iter: [200]}
+    logistic: {C: [0.1, 1.0, 10.0]}
+    knn: {n_neighbors: [15, 51, 151]}

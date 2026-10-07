@@ -1,0 +1,518 @@
+[
+ {
+  "video": "a-remote-possibility",
+  "query": "astronaut controlling a rover remotely from space",
+  "start": 6.8,
+  "end": 35.9
+ },
+ {
+  "video": "a-remote-possibility",
+  "query": "people waving at Saturn as Cassini photographs Earth",
+  "start": 35.9,
+  "end": 60.7
+ },
+ {
+  "video": "a-remote-possibility",
+  "query": "Earth and the Moon seen from Mercury orbiter",
+  "start": 60.7,
+  "end": 79.5
+ },
+ {
+  "video": "a-remote-possibility",
+  "query": "tracks left by Curiosity on Mars seen from orbit",
+  "start": 79.5,
+  "end": 101.9
+ },
+ {
+  "video": "a-remote-possibility",
+  "query": "telescope checking the Sun's atmosphere",
+  "start": 101.9,
+  "end": 128.7
+ },
+ {
+  "video": "a-remote-possibility",
+  "query": "custom videos of the Sun made on a website",
+  "start": 128.7,
+  "end": 156.9
+ },
+ {
+  "video": "a-remote-possibility",
+  "query": "NASA administrator at Tech Day on the Hill in Washington",
+  "start": 156.9,
+  "end": 172.9
+ },
+ {
+  "video": "a-remote-possibility",
+  "query": "Orion parachute test dropped from an airplane",
+  "start": 192.8,
+  "end": 218.1
+ },
+ {
+  "video": "a-remote-possibility",
+  "query": "astronauts in orange suits inside a Boeing capsule",
+  "start": 218.1,
+  "end": 251.3
+ },
+ {
+  "video": "a-remote-possibility",
+  "query": "commercial space industry conference speech",
+  "start": 251.3,
+  "end": 274.1
+ },
+ {
+  "video": "a-remote-possibility",
+  "query": "flying observatory deployed to New Zealand",
+  "start": 274.1,
+  "end": 295.9
+ },
+ {
+  "video": "a-remote-possibility",
+  "query": "ion propulsion engine fuel efficiency",
+  "start": 295.9,
+  "end": 317.2
+ },
+ {
+  "video": "a-remote-possibility",
+  "query": "astronaut talking with students about science and math",
+  "start": 317.2,
+  "end": 339.0
+ },
+ {
+  "video": "a-remote-possibility",
+  "query": "online hangout remembering Sally Ride",
+  "start": 339.0,
+  "end": 367.3
+ },
+ {
+  "video": "a-remote-possibility",
+  "query": "space shuttle Enterprise museum exhibits in New York",
+  "start": 367.3,
+  "end": 386.0
+ },
+ {
+  "video": "administrator-chats-astronauts",
+  "query": "astronauts chatting with the NASA administrator",
+  "start": 16.9,
+  "end": 45.9
+ },
+ {
+  "video": "administrator-chats-astronauts",
+  "query": "living on the space station and recycling everything",
+  "start": 45.9,
+  "end": 70.9
+ },
+ {
+  "video": "administrator-chats-astronauts",
+  "query": "plans to return to the Moon and send humans to Mars",
+  "start": 70.9,
+  "end": 83.9
+ },
+ {
+  "video": "administrator-chats-astronauts",
+  "query": "massive dust storm covering Mars",
+  "start": 83.9,
+  "end": 115.2
+ },
+ {
+  "video": "administrator-chats-astronauts",
+  "query": "spacewalk to install cameras outside the station",
+  "start": 115.2,
+  "end": 142.2
+ },
+ {
+  "video": "administrator-chats-astronauts",
+  "query": "astronaut retires after record time in space",
+  "start": 142.2,
+  "end": 174.6
+ },
+ {
+  "video": "administrator-chats-astronauts",
+  "query": "unmanned aircraft flying without a chase plane",
+  "start": 174.6,
+  "end": 208.1
+ },
+ {
+  "video": "administrator-chats-astronauts",
+  "query": "emergency search and rescue and fighting forest fires with drones",
+  "start": 194.1,
+  "end": 208.1
+ },
+ {
+  "video": "commercial-crew-milestone",
+  "query": "crew capsule abort test at White Sands missile range",
+  "start": 14.6,
+  "end": 46.1
+ },
+ {
+  "video": "commercial-crew-milestone",
+  "query": "cargo spacecraft captured by the robotic arm at the space station",
+  "start": 57.5,
+  "end": 90.5
+ },
+ {
+  "video": "commercial-crew-milestone",
+  "query": "mosaic of the southern sky stitched from many images",
+  "start": 90.5,
+  "end": 111.8
+ },
+ {
+  "video": "commercial-crew-milestone",
+  "query": "Milky Way and Magellanic Cloud in a sky survey",
+  "start": 111.8,
+  "end": 130.8
+ },
+ {
+  "video": "commercial-crew-milestone",
+  "query": "discovery of exoplanets beyond our solar system",
+  "start": 130.8,
+  "end": 143.5
+ },
+ {
+  "video": "commercial-crew-milestone",
+  "query": "untouched Apollo 17 moon rock sample opened in a lab",
+  "start": 143.5,
+  "end": 181.8
+ },
+ {
+  "video": "commercial-crew-milestone",
+  "query": "preserving moon samples for future technology",
+  "start": 181.8,
+  "end": 197.7
+ },
+ {
+  "video": "commercial-crew-milestone",
+  "query": "former Apollo astronaut giving a presentation about going back to the Moon",
+  "start": 197.7,
+  "end": 231.9
+ },
+ {
+  "video": "commercial-crew-milestone",
+  "query": "why human exploration is worth doing",
+  "start": 231.9,
+  "end": 253.8
+ },
+ {
+  "video": "cosmic-phenomenon",
+  "query": "space telescope traces a neutrino to a supermassive black hole",
+  "start": 17.0,
+  "end": 58.8
+ },
+ {
+  "video": "cosmic-phenomenon",
+  "query": "the sound of plasma waves between Saturn and its moon",
+  "start": 58.8,
+  "end": 103.5
+ },
+ {
+  "video": "cosmic-phenomenon",
+  "query": "pillars of creation star-forming region in X-ray and optical light",
+  "start": 103.5,
+  "end": 133.1
+ },
+ {
+  "video": "cosmic-phenomenon",
+  "query": "newly selected flight directors announced",
+  "start": 133.1,
+  "end": 156.3
+ },
+ {
+  "video": "cosmic-phenomenon",
+  "query": "Russian cargo spacecraft arrives at the space station",
+  "start": 156.3,
+  "end": 187.3
+ },
+ {
+  "video": "hubble-exoplanet",
+  "query": "water vapor found on a planet in the habitable zone",
+  "start": 14.0,
+  "end": 53.0
+ },
+ {
+  "video": "hubble-exoplanet",
+  "query": "astronaut crew training near Moscow before launch",
+  "start": 54.0,
+  "end": 82.0
+ },
+ {
+  "video": "hubble-exoplanet",
+  "query": "mobile launcher carried back to the launch pad by a crawler",
+  "start": 83.0,
+  "end": 111.0
+ },
+ {
+  "video": "hubble-exoplanet",
+  "query": "first uncrewed test flight of Orion and the SLS rocket",
+  "start": 112.0,
+  "end": 163.0
+ },
+ {
+  "video": "hubble-exoplanet",
+  "query": "animated video showing parts of the flight hardware",
+  "start": 140.0,
+  "end": 151.0
+ },
+ {
+  "video": "hubble-exoplanet",
+  "query": "explosions of warming liquid nitrogen shaping craters on Titan",
+  "start": 164.0,
+  "end": 188.0
+ },
+ {
+  "video": "hubble-exoplanet",
+  "query": "methane lakes on Saturn's moon Titan",
+  "start": 175.0,
+  "end": 204.0
+ },
+ {
+  "video": "hubble-exoplanet",
+  "query": "Cassini spacecraft final plunge into Saturn",
+  "start": 204.0,
+  "end": 215.0
+ },
+ {
+  "video": "mars-mission-briefed",
+  "query": "news briefing about the next mission to study the Martian atmosphere",
+  "start": 13.4,
+  "end": 40.4
+ },
+ {
+  "video": "mars-mission-briefed",
+  "query": "administrator thanking employees at an aviation research center",
+  "start": 40.4,
+  "end": 55.4
+ },
+ {
+  "video": "mars-mission-briefed",
+  "query": "engineers powering up the Orion spacecraft for the first time",
+  "start": 55.4,
+  "end": 70.4
+ },
+ {
+  "video": "mars-mission-briefed",
+  "query": "solar flares disrupting GPS and satellite signals",
+  "start": 70.4,
+  "end": 87.4
+ },
+ {
+  "video": "mars-mission-briefed",
+  "query": "cargo vehicle leaving the space station",
+  "start": 87.4,
+  "end": 98.4
+ },
+ {
+  "video": "mars-mission-briefed",
+  "query": "Olympic torch arrives at the space station",
+  "start": 105.4,
+  "end": 125.4
+ },
+ {
+  "video": "mars-mission-briefed",
+  "query": "spacecraft landing gear problem during a free flight test",
+  "start": 125.4,
+  "end": 141.4
+ },
+ {
+  "video": "mars-mission-briefed",
+  "query": "research plane measuring melting ice in Greenland",
+  "start": 151.4,
+  "end": 177.4
+ },
+ {
+  "video": "new-explorers-new-roadmap",
+  "query": "new astronaut candidates meeting the press",
+  "start": 6.7,
+  "end": 34.6
+ },
+ {
+  "video": "new-explorers-new-roadmap",
+  "query": "global exploration roadmap for asteroids and Mars",
+  "start": 34.6,
+  "end": 77.9
+ },
+ {
+  "video": "new-explorers-new-roadmap",
+  "query": "mock-up of a commercial crew capsule",
+  "start": 77.9,
+  "end": 99.0
+ },
+ {
+  "video": "new-explorers-new-roadmap",
+  "query": "cosmonauts conducting a spacewalk outside the station",
+  "start": 99.0,
+  "end": 122.6
+ },
+ {
+  "video": "new-explorers-new-roadmap",
+  "query": "mission to study dust around the Moon",
+  "start": 122.6,
+  "end": 155.7
+ },
+ {
+  "video": "new-explorers-new-roadmap",
+  "query": "Webb telescope mirror support structure tested in a cold chamber",
+  "start": 155.7,
+  "end": 185.2
+ },
+ {
+  "video": "new-explorers-new-roadmap",
+  "query": "airborne study of air pollution and storms",
+  "start": 185.2,
+  "end": 212.2
+ },
+ {
+  "video": "new-explorers-new-roadmap",
+  "query": "747 shuttle carrier aircraft going on public display",
+  "start": 212.2,
+  "end": 237.1
+ },
+ {
+  "video": "new-explorers-new-roadmap",
+  "query": "memorial service remembering Neil Armstrong",
+  "start": 237.1,
+  "end": 266.9
+ },
+ {
+  "video": "smoke-and-fire",
+  "query": "rocket engine test firing",
+  "start": 4.6,
+  "end": 29.7
+ },
+ {
+  "video": "smoke-and-fire",
+  "query": "social media event before an engine test",
+  "start": 29.7,
+  "end": 41.2
+ },
+ {
+  "video": "smoke-and-fire",
+  "query": "astronauts eating lettuce grown in space",
+  "start": 41.2,
+  "end": 71.0
+ },
+ {
+  "video": "smoke-and-fire",
+  "query": "cosmonauts retrieve an experiment during a spacewalk",
+  "start": 71.0,
+  "end": 101.2
+ },
+ {
+  "video": "smoke-and-fire",
+  "query": "cargo craft undocking from the station",
+  "start": 101.2,
+  "end": 120.3
+ },
+ {
+  "video": "smoke-and-fire",
+  "query": "smallest supermassive black hole ever found",
+  "start": 120.3,
+  "end": 149.2
+ },
+ {
+  "video": "smoke-and-fire",
+  "query": "ten year anniversary of a Mars orbiter searching for water",
+  "start": 149.2,
+  "end": 180.2
+ },
+ {
+  "video": "smoke-and-fire",
+  "query": "telescope sunshield with sun protection factor of a million",
+  "start": 180.2,
+  "end": 203.0
+ },
+ {
+  "video": "smoke-and-fire",
+  "query": "Perseid meteor shower live coverage",
+  "start": 203.0,
+  "end": 227.3
+ },
+ {
+  "video": "this-week-at-nasa",
+  "query": "solar storm travelling from the Sun to Earth",
+  "start": 6,
+  "end": 81
+ },
+ {
+  "video": "this-week-at-nasa",
+  "query": "preparing the Curiosity rover for its trip to Mars",
+  "start": 81,
+  "end": 115
+ },
+ {
+  "video": "this-week-at-nasa",
+  "query": "shuttle crew appearances around New York City",
+  "start": 115,
+  "end": 160
+ },
+ {
+  "video": "this-week-at-nasa",
+  "query": "astronauts with Elmo",
+  "start": 160,
+  "end": 175
+ },
+ {
+  "video": "this-week-at-nasa",
+  "query": "astronaut explains what makes a good astronaut",
+  "start": 141,
+  "end": 151
+ },
+ {
+  "video": "this-week-at-nasa",
+  "query": "crew meeting visitors at a museum with the shuttle Enterprise",
+  "start": 205,
+  "end": 226
+ },
+ {
+  "video": "this-week-at-nasa",
+  "query": "pilot talking about rocket engine reliability",
+  "start": 243,
+  "end": 258
+ },
+ {
+  "video": "this-week-at-nasa",
+  "query": "astronauts thanking employees at a space center",
+  "start": 234,
+  "end": 243
+ },
+ {
+  "video": "this-week-at-nasa",
+  "query": "IT summit with technology leaders",
+  "start": 258,
+  "end": 313
+ },
+ {
+  "video": "this-week-at-nasa",
+  "query": "celebrating thirty years of the space shuttle program",
+  "start": 323,
+  "end": 340
+ },
+ {
+  "video": "this-week-at-nasa",
+  "query": "agreement to study coastal environment and sea level rise",
+  "start": 353,
+  "end": 439
+ },
+ {
+  "video": "this-week-at-nasa",
+  "query": "retired Apollo 13 astronaut honored at a ballgame with bobblehead dolls",
+  "start": 439,
+  "end": 513
+ },
+ {
+  "video": "this-week-at-nasa",
+  "query": "two jumbo jets flying together over the desert",
+  "start": 522,
+  "end": 593
+ },
+ {
+  "video": "this-week-at-nasa",
+  "query": "astronauts answering advice for becoming an astronaut",
+  "start": 593,
+  "end": 616
+ },
+ {
+  "video": "this-week-at-nasa",
+  "query": "astronauts throwing ceremonial first pitches at a baseball game",
+  "start": 616,
+  "end": 636
+ }
+]

@@ -59,6 +59,8 @@ class ScoreTimeline:
     fused: np.ndarray
     visual_meta: dict[str, Any]
     transcript_meta: dict[str, Any]
+    visual_raw: np.ndarray | None = None
+    transcript_raw: np.ndarray | None = None
 
 
 def score_video(
@@ -73,7 +75,8 @@ def score_video(
         alpha: Optional override for the configured visual fusion weight.
 
     Returns:
-        Min-max-normalized visual and transcript scores plus their fusion.
+        Min-max-normalized visual and transcript scores plus their fusion, and
+        the raw cosine similarities they were normalized from.
     """
     index_dir = Path(cfg.paths.index) / video_id
     visual_index, visual_meta = load_index(index_dir, "visual")
@@ -116,6 +119,8 @@ def score_video(
         fuse_scores(normalized_visual, normalized_transcript, selected_alpha),
         visual_meta,
         transcript_meta,
+        visual_raw=dense_visual,
+        transcript_raw=aligned_transcript,
     )
 
 

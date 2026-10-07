@@ -73,6 +73,23 @@ class EvaluationConfig:
 
 
 @dataclass(frozen=True)
+class MLConfig:
+    """Settings for the regression/classification analysis in ``analysis/``."""
+
+    benchmark: Path
+    seed: int
+    baseline_alpha: float
+    relevance_decay_s: float
+    smooth_window: int
+    inner_folds: int
+    permutation_repeats: int
+    retrieval_ks: tuple[int, ...]
+    figures_dir: Path
+    tables_dir: Path
+    grids: dict[str, dict[str, list]]
+
+
+@dataclass(frozen=True)
 class Config:
     """The complete immutable application configuration."""
 
@@ -82,6 +99,7 @@ class Config:
     encode: EncodeConfig
     search: SearchConfig
     evaluation: EvaluationConfig
+    ml: MLConfig
 
 
 def _require_mapping(value: object, section: str) -> dict[str, Any]:
@@ -100,6 +118,7 @@ def _build_config(data: dict[str, Any]) -> Config:
         encode = _require_mapping(data["encode"], "encode")
         search = _require_mapping(data["search"], "search")
         evaluation = _require_mapping(data["evaluation"], "evaluation")
+        ml = _require_mapping(data["ml"], "ml")
         return Config(
             paths=PathsConfig(
                 raw=Path(paths["raw"]),
@@ -117,6 +136,19 @@ def _build_config(data: dict[str, Any]) -> Config:
                 clip_models=tuple(evaluation["clip_models"]),
                 moment_iou_thresholds=tuple(evaluation["moment_iou_thresholds"]),
                 plot_dpi=evaluation["plot_dpi"],
+            ),
+            ml=MLConfig(
+                benchmark=Path(ml["benchmark"]),
+                seed=ml["seed"],
+                baseline_alpha=ml["baseline_alpha"],
+                relevance_decay_s=ml["relevance_decay_s"],
+                smooth_window=ml["smooth_window"],
+                inner_folds=ml["inner_folds"],
+                permutation_repeats=ml["permutation_repeats"],
+                retrieval_ks=tuple(ml["retrieval_ks"]),
+                figures_dir=Path(ml["figures_dir"]),
+                tables_dir=Path(ml["tables_dir"]),
+                grids=dict(_require_mapping(ml["grids"], "ml.grids")),
             ),
         )
     except (KeyError, TypeError) as exc:
