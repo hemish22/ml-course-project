@@ -19,14 +19,36 @@ Set all paths, models, inference settings, and retrieval thresholds in
 
 ## Run
 
+Index a video, then start the API and the web app (two terminals):
+
 ```bash
+python scripts/fetch_demo.py                 # optional: public-domain NASA episode (about 11 min)
 python scripts/ingest.py --video data/raw/lecture.mp4
+uvicorn server.main:app --port 8000          # API and video/thumbnail server
+
+cd web && npm install && npm run dev         # http://localhost:3000
+```
+
+Search from the terminal instead:
+
+```bash
 python scripts/query.py --q "person writing on the whiteboard" --video lecture --alpha 0.7
-streamlit run app.py
 ```
 
 Ingestion is resumable: rerun the first command to reuse complete artifacts, or
 add `--force` to rebuild them.
+
+### Web app
+
+The full video is shown until you search. A search swaps the player for the
+best-matching clip only (bounded timeline, auto-play, stops at the end); pick
+other results from the list or the timeline, or choose *Show full video* to go
+back. The strip under the player shows every second of the video scored by
+picture (blue) and speech (amber); the slider re-weights the two live.
+
+Set `NEXT_PUBLIC_API_URL` in `web/.env.local` if the API is not on
+`http://localhost:8000`. On macOS the entry points set `OMP_NUM_THREADS=1`
+because FAISS and PyTorch otherwise crash on duplicate OpenMP runtimes.
 
 ## Evaluation
 
