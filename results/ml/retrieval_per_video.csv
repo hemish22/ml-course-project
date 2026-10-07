@@ -26,21 +26,21 @@ Speech only,mars-mission-briefed,0.875,0.875,0.8928571428571428
 Speech only,new-explorers-new-roadmap,1.0,1.0,1.0
 Speech only,smoke-and-fire,1.0,1.0,1.0
 Speech only,this-week-at-nasa,0.8,0.8,0.825
-Regression: Gradient boosting,a-remote-possibility,0.8666666666666667,1.0,0.9111111111111111
-Regression: Gradient boosting,administrator-chats-astronauts,0.875,1.0,0.90625
-Regression: Gradient boosting,commercial-crew-milestone,0.8888888888888888,0.8888888888888888,0.8918128654970761
+Regression: Gradient boosting,a-remote-possibility,0.9333333333333333,1.0,0.9666666666666667
+Regression: Gradient boosting,administrator-chats-astronauts,0.75,0.875,0.7986111111111112
+Regression: Gradient boosting,commercial-crew-milestone,0.8888888888888888,0.8888888888888888,0.8912037037037037
 Regression: Gradient boosting,cosmic-phenomenon,1.0,1.0,1.0
 Regression: Gradient boosting,hubble-exoplanet,1.0,1.0,1.0
-Regression: Gradient boosting,mars-mission-briefed,0.875,1.0,0.9375
+Regression: Gradient boosting,mars-mission-briefed,1.0,1.0,1.0
 Regression: Gradient boosting,new-explorers-new-roadmap,1.0,1.0,1.0
 Regression: Gradient boosting,smoke-and-fire,1.0,1.0,1.0
-Regression: Gradient boosting,this-week-at-nasa,0.8,0.8666666666666667,0.84
-Classification: Gradient boosting,a-remote-possibility,0.9333333333333333,0.9333333333333333,0.9444444444444444
-Classification: Gradient boosting,administrator-chats-astronauts,0.75,1.0,0.8
-Classification: Gradient boosting,commercial-crew-milestone,0.8888888888888888,0.8888888888888888,0.8918128654970761
+Regression: Gradient boosting,this-week-at-nasa,0.7333333333333333,0.8,0.7691259290591577
+Classification: Gradient boosting,a-remote-possibility,1.0,1.0,1.0
+Classification: Gradient boosting,administrator-chats-astronauts,0.75,0.875,0.7846153846153846
+Classification: Gradient boosting,commercial-crew-milestone,0.8888888888888888,0.8888888888888888,0.891358024691358
 Classification: Gradient boosting,cosmic-phenomenon,1.0,1.0,1.0
 Classification: Gradient boosting,hubble-exoplanet,1.0,1.0,1.0
-Classification: Gradient boosting,mars-mission-briefed,0.75,1.0,0.875
+Classification: Gradient boosting,mars-mission-briefed,1.0,1.0,1.0
 Classification: Gradient boosting,new-explorers-new-roadmap,1.0,1.0,1.0
 Classification: Gradient boosting,smoke-and-fire,1.0,1.0,1.0
-Classification: Gradient boosting,this-week-at-nasa,0.6,0.8,0.6761904761904761
+Classification: Gradient boosting,this-week-at-nasa,0.7333333333333333,0.8,0.7528540810077858
