@@ -24,7 +24,7 @@ from sklearn.metrics import (
     roc_auc_score,
 )
 from sklearn.model_selection import GridSearchCV, GroupKFold, cross_val_predict
-from tqdm.auto import tqdm
+from joblib import Parallel, delayed
 
 from analysis.features import FEATURES, KEYS
 from analysis.models import CLASSIFIERS, REGRESSORS, make_model, param_grid
@@ -65,6 +65,34 @@ def _proba(model: Any, X: pd.DataFrame) -> np.ndarray:
     return model.predict_proba(X)[:, 1]
 
 
+def smooth_by_query(values: np.ndarray, query_ids: np.ndarray, window: int) -> np.ndarray:
+    """Centered moving average of ``values`` within each query's timeline (rows must be time-ordered).
+
+    Moments are runs of consecutive seconds, so averaging a model's per-second output over
+    neighbouring seconds removes isolated spikes. ``window`` is in seconds (frames).
+    """
+    if window <= 1:
+        return np.asarray(values, dtype=np.float64)
+    series = pd.Series(np.asarray(values, dtype=np.float64))
+    smoothed = series.groupby(np.asarray(query_ids)).transform(
+        lambda x: x.rolling(window, center=True, min_periods=1).mean()
+    )
+    return smoothed.to_numpy()
+
+
+def choose_smoothing_window(
+    task: str, raw: np.ndarray, y: np.ndarray, query_ids: np.ndarray, windows: tuple[int, ...]
+) -> int:
+    """Pick the smoothing width that scores best on (out-of-fold) training predictions."""
+    def score(window: int) -> float:
+        smoothed = smooth_by_query(raw, query_ids, window)
+        if task == "regression":
+            return -float(np.sqrt(mean_squared_error(y, smoothed)))
+        return float(average_precision_score(y, smoothed))
+
+    return max(windows, key=score)
+
+
 @dataclass
 class ExperimentResult:
     """Everything produced by one leave-one-video-out run."""
@@ -93,111 +121,158 @@ def _tune(name: str, task: str, X: pd.DataFrame, y: np.ndarray, groups: np.ndarr
     return search
 
 
-def run_experiment(df: pd.DataFrame, cfg: object, learning_sizes: tuple[int, ...] = (1, 2, 4, 6)) -> ExperimentResult:
-    """Leave-one-video-out regression and classification with tuning, thresholds and importances.
-
-    Every prediction in ``oof`` comes from a model that never saw that video. Hyper-parameters
-    and the F1 threshold are chosen only on the training videos of each fold.
-    """
-    videos = sorted(df["video_id"].unique())
-    rng = np.random.default_rng(cfg.ml.seed)
-    oof_parts: list[pd.DataFrame] = []
+def _run_fold(
+    held_out: str,
+    fold_index: int,
+    df: pd.DataFrame,
+    cfg: object,
+    features: list[str],
+    windows: tuple[int, ...],
+    learning_sizes: tuple[int, ...],
+    light: bool,
+) -> dict[str, Any]:
+    """Train, tune and score every model with ``held_out`` as the unseen video."""
+    rng = np.random.default_rng(cfg.ml.seed + fold_index)
     param_rows: list[dict] = []
     reg_rows: list[dict] = []
     cls_rows: list[dict] = []
     imp_rows: list[dict] = []
     curve_rows: list[dict] = []
     threshold_rows: list[dict] = []
+    train = df[df["video_id"] != held_out]
+    test = df[df["video_id"] == held_out]
+    X_train, X_test = train[features], test[features]
+    qid_train, qid_test = train["query_id"].to_numpy(), test["query_id"].to_numpy()
+    groups = train["video_id"].to_numpy()
+    part = test[KEYS + ["rel_graded", "rel_binary"]].copy()
+    part["fold_video"] = held_out
+    train_videos = sorted(train["video_id"].unique())
 
-    for held_out in tqdm(videos, desc="Leave-one-video-out"):
-        train = df[df["video_id"] != held_out]
-        test = df[df["video_id"] == held_out]
-        X_train, X_test = train[FEATURES], test[FEATURES]
-        groups = train["video_id"].to_numpy()
-        part = test[KEYS + ["rel_graded", "rel_binary"]].copy()
-        part["fold_video"] = held_out
-        train_videos = sorted(train["video_id"].unique())
+    for task, models, target in (
+        ("regression", REGRESSORS, "rel_graded"),
+        ("classification", CLASSIFIERS, "rel_binary"),
+    ):
+        y_train, y_test = train[target].to_numpy(), test[target].to_numpy()
+        prefix = "reg" if task == "regression" else "cls"
 
-        for task, models, target in (
-            ("regression", REGRESSORS, "rel_graded"),
-            ("classification", CLASSIFIERS, "rel_binary"),
-        ):
-            y_train, y_test = train[target].to_numpy(), test[target].to_numpy()
-            prefix = "reg" if task == "regression" else "cls"
+        dummy = make_model("dummy", task, cfg.ml.seed).fit(X_train, y_train)
+        if task == "regression":
+            part["reg_dummy"] = dummy.predict(X_test)
+            reg_rows.append({"fold_video": held_out, "model": "dummy", **regression_metrics(y_test, part["reg_dummy"])})
+        else:
+            part["cls_dummy"] = _proba(dummy, X_test)
+            part["cls_dummy_pred"] = 0
+            cls_rows.append({
+                "fold_video": held_out, "model": "dummy", "threshold": 0.5,
+                **classification_metrics(y_test, part["cls_dummy"], part["cls_dummy_pred"]),
+            })
 
-            dummy = make_model("dummy", task, cfg.ml.seed).fit(X_train, y_train)
+        for name in models:
+            search = _tune(name, task, X_train, y_train, groups, cfg)
+            best = search.best_estimator_
+            param_rows.append({
+                "fold_video": held_out, "task": task, "model": name,
+                "params": str(search.best_params_), "inner_cv_score": float(search.best_score_),
+            })
+            inner_cv = GroupKFold(n_splits=min(cfg.ml.inner_folds, len(train_videos)))
             if task == "regression":
-                part["reg_dummy"] = dummy.predict(X_test)
-                reg_rows.append({"fold_video": held_out, "model": "dummy", **regression_metrics(y_test, part["reg_dummy"])})
+                inner = cross_val_predict(clone(best), X_train, y_train, groups=groups, cv=inner_cv)
+                window = choose_smoothing_window(task, inner, y_train, qid_train, windows)
+                raw_prediction = best.predict(X_test)
+                prediction = smooth_by_query(raw_prediction, qid_test, window)
+                part[f"reg_{name}_raw"] = raw_prediction
+                part[f"reg_{name}"] = prediction
+                reg_rows.append({"fold_video": held_out, "model": name, **regression_metrics(y_test, prediction)})
+                threshold_rows.append({"fold_video": held_out, "model": name, "task": task, "smooth_window": window})
+                scoring = "neg_root_mean_squared_error"
             else:
-                part["cls_dummy"] = _proba(dummy, X_test)
-                part["cls_dummy_pred"] = 0
+                inner = cross_val_predict(
+                    clone(best), X_train, y_train, groups=groups, cv=inner_cv, method="predict_proba",
+                )[:, 1]
+                window = choose_smoothing_window(task, inner, y_train, qid_train, windows)
+                threshold = best_f1_threshold(y_train, smooth_by_query(inner, qid_train, window))
+                raw_proba = _proba(best, X_test)
+                proba = smooth_by_query(raw_proba, qid_test, window)
+                part[f"cls_{name}_raw"] = raw_proba
+                part[f"cls_{name}"] = proba
+                part[f"cls_{name}_pred"] = (proba >= threshold).astype(int)
                 cls_rows.append({
-                    "fold_video": held_out, "model": "dummy", "threshold": 0.5,
-                    **classification_metrics(y_test, part["cls_dummy"], part["cls_dummy_pred"]),
+                    "fold_video": held_out, "model": name, "threshold": threshold,
+                    **classification_metrics(y_test, proba, part[f"cls_{name}_pred"]),
                 })
+                threshold_rows.append({"fold_video": held_out, "model": name, "task": task,
+                                       "threshold": threshold, "smooth_window": window})
+                scoring = "average_precision"
+            if light:
+                continue
 
-            for name in models:
-                search = _tune(name, task, X_train, y_train, groups, cfg)
-                best = search.best_estimator_
-                param_rows.append({
-                    "fold_video": held_out, "task": task, "model": name,
-                    "params": str(search.best_params_), "inner_cv_score": float(search.best_score_),
-                })
-                if task == "regression":
-                    prediction = best.predict(X_test)
-                    part[f"reg_{name}"] = prediction
-                    reg_rows.append({"fold_video": held_out, "model": name, **regression_metrics(y_test, prediction)})
-                    scoring = "neg_root_mean_squared_error"
-                else:
-                    inner = cross_val_predict(
-                        clone(best), X_train, y_train, groups=groups,
-                        cv=GroupKFold(n_splits=min(cfg.ml.inner_folds, len(train_videos))),
-                        method="predict_proba",
-                    )[:, 1]
-                    threshold = best_f1_threshold(y_train, inner)
-                    proba = _proba(best, X_test)
-                    part[f"cls_{name}"] = proba
-                    part[f"cls_{name}_pred"] = (proba >= threshold).astype(int)
-                    cls_rows.append({
-                        "fold_video": held_out, "model": name, "threshold": threshold,
-                        **classification_metrics(y_test, proba, part[f"cls_{name}_pred"]),
-                    })
-                    threshold_rows.append({"fold_video": held_out, "model": name, "threshold": threshold})
-                    scoring = "average_precision"
+            importance = permutation_importance(
+                best, X_test, y_test, scoring=scoring,
+                n_repeats=cfg.ml.permutation_repeats, random_state=cfg.ml.seed, n_jobs=1,
+            )
+            for feature, mean, std in zip(features, importance.importances_mean, importance.importances_std):
+                imp_rows.append({"task": task, "model": name, "fold_video": held_out,
+                                 "feature": feature, "importance": float(mean), "std": float(std)})
 
-                importance = permutation_importance(
-                    best, X_test, y_test, scoring=scoring,
-                    n_repeats=cfg.ml.permutation_repeats, random_state=cfg.ml.seed, n_jobs=1,
-                )
-                for feature, mean, std in zip(FEATURES, importance.importances_mean, importance.importances_std):
-                    imp_rows.append({"task": task, "model": name, "fold_video": held_out,
-                                     "feature": feature, "importance": float(mean), "std": float(std)})
+            for size in learning_sizes:
+                if size > len(train_videos):
+                    continue
+                for _ in range(2):
+                    subset = rng.choice(train_videos, size=size, replace=False)
+                    sub = train[train["video_id"].isin(subset)]
+                    model = clone(best).fit(sub[features], sub[target])
+                    if task == "regression":
+                        score = regression_metrics(y_test, model.predict(X_test))["rmse"]
+                    else:
+                        score = classification_metrics(
+                            y_test, _proba(model, X_test), (_proba(model, X_test) >= 0.5).astype(int)
+                        )["pr_auc"]
+                    curve_rows.append({"task": task, "model": name, "n_train_videos": size, "score": score})
 
-                for size in learning_sizes:
-                    if size > len(train_videos):
-                        continue
-                    for _ in range(2):
-                        subset = rng.choice(train_videos, size=size, replace=False)
-                        sub = train[train["video_id"].isin(subset)]
-                        model = clone(best).fit(sub[FEATURES], sub[target])
-                        if task == "regression":
-                            score = regression_metrics(y_test, model.predict(X_test))["rmse"]
-                        else:
-                            score = classification_metrics(
-                                y_test, _proba(model, X_test), (_proba(model, X_test) >= 0.5).astype(int)
-                            )["pr_auc"]
-                        curve_rows.append({"task": task, "model": name, "n_train_videos": size, "score": score})
-        oof_parts.append(part)
+    return {
+        "part": part, "params": param_rows, "reg": reg_rows, "cls": cls_rows,
+        "importance": imp_rows, "curve": curve_rows, "thresholds": threshold_rows,
+    }
+
+
+def run_experiment(
+    df: pd.DataFrame,
+    cfg: object,
+    learning_sizes: tuple[int, ...] = (1, 2, 4, 6),
+    features: list[str] | None = None,
+    smooth: bool = True,
+    light: bool = False,
+) -> ExperimentResult:
+    """Leave-one-video-out regression and classification with tuning, thresholds and importances.
+
+    Every prediction in ``oof`` comes from a model that never saw that video. Hyper-parameters,
+    the output-smoothing width and the F1 threshold are chosen only on the training videos of each fold.
+
+    Args:
+        df: Feature table from ``build_dataset``.
+        cfg: Application configuration.
+        learning_sizes: Training-video counts for the learning curve.
+        features: Feature columns to use (default: all).
+        smooth: Smooth model outputs over time before scoring (width chosen on training videos).
+        light: Skip permutation importance and learning curves (used for ablation variants).
+    """
+    features = features or FEATURES
+    windows = tuple(cfg.ml.output_smooth_windows) if smooth else (1,)
+    videos = sorted(df["video_id"].unique())
+    results = Parallel(n_jobs=cfg.ml.n_jobs, verbose=5)(
+        delayed(_run_fold)(video, index, df, cfg, features, windows, learning_sizes, light)
+        for index, video in enumerate(videos)
+    )
+    flat = lambda key: [row for result in results for row in result[key]]  # noqa: E731
 
     return ExperimentResult(
-        oof=pd.concat(oof_parts, ignore_index=True),
-        best_params=pd.DataFrame(param_rows),
-        regression_folds=pd.DataFrame(reg_rows),
-        classification_folds=pd.DataFrame(cls_rows),
-        importance=pd.DataFrame(imp_rows),
-        learning_curve=pd.DataFrame(curve_rows),
-        thresholds=pd.DataFrame(threshold_rows),
+        oof=pd.concat([result["part"] for result in results], ignore_index=True),
+        best_params=pd.DataFrame(flat("params")),
+        regression_folds=pd.DataFrame(flat("reg")),
+        classification_folds=pd.DataFrame(flat("cls")),
+        importance=pd.DataFrame(flat("importance")),
+        learning_curve=pd.DataFrame(flat("curve")),
+        thresholds=pd.DataFrame(flat("thresholds")),
     )
 
 
@@ -300,4 +375,25 @@ def alpha_sweep(dataset: pd.DataFrame, alphas: tuple[float, ...], ks: tuple[int,
         frame["score"] = alpha * dataset["visual_norm"] + (1 - alpha) * dataset["speech_norm"]
         stats = _rank_stats(frame, "score", ks, rng).drop(columns=["query_id", "video_id"]).mean().to_dict()
         rows.append({"alpha": alpha, **stats})
+    return pd.DataFrame(rows)
+
+
+def summarise_variant(label: str, oof: pd.DataFrame, dataset: pd.DataFrame, cfg: object) -> pd.DataFrame:
+    """One row per model: pooled held-out metrics plus search ranking (Hit@1, Hit@5, MRR)."""
+    ks = (1, 5)
+    ranking = retrieval_metrics(oof, dataset, ks, cfg.ml.seed).set_index("method")
+    rows = []
+    for key, name in REGRESSORS.items():
+        rows.append({
+            "variant": label, "task": "regression", "model": key,
+            **regression_metrics(oof["rel_graded"].to_numpy(), oof[f"reg_{key}"].to_numpy()),
+            **{m: float(ranking.loc[f"Regression: {name}", m]) for m in ("hit_at_1", "hit_at_5", "mrr")},
+        })
+    for key, name in CLASSIFIERS.items():
+        rows.append({
+            "variant": label, "task": "classification", "model": key,
+            **classification_metrics(oof["rel_binary"].to_numpy(), oof[f"cls_{key}"].to_numpy(),
+                                     oof[f"cls_{key}_pred"].to_numpy()),
+            **{m: float(ranking.loc[f"Classification: {name}", m]) for m in ("hit_at_1", "hit_at_5", "mrr")},
+        })
     return pd.DataFrame(rows)

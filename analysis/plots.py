@@ -125,7 +125,7 @@ def fig_correlation(dataset: pd.DataFrame, out: Path, dpi: int) -> None:
     columns = FEATURES + ["rel_graded", "rel_binary"]
     corr = dataset[columns].corr()
     cmap = LinearSegmentedColormap.from_list("div", [SLOTS[1], "#f4f4f2", SLOTS[0]])
-    fig, ax = plt.subplots(figsize=(9, 7.6))
+    fig, ax = plt.subplots(figsize=(13, 11))
     image = ax.imshow(corr.values, cmap=cmap, vmin=-1, vmax=1)
     ax.set_xticks(range(len(columns)), columns, rotation=60, ha="right")
     ax.set_yticks(range(len(columns)), columns)
@@ -133,7 +133,7 @@ def fig_correlation(dataset: pd.DataFrame, out: Path, dpi: int) -> None:
     for i in range(len(columns)):
         for j in range(len(columns)):
             value = corr.values[i, j]
-            ax.text(j, i, f"{value:.1f}", ha="center", va="center", fontsize=7,
+            ax.text(j, i, f"{value:.1f}", ha="center", va="center", fontsize=5.5,
                     color="white" if abs(value) > 0.65 else INK_SOFT)
     fig.colorbar(image, ax=ax, shrink=0.7, label="Pearson correlation")
     ax.set_title("Which features move together, and with the labels")
@@ -271,7 +271,7 @@ def fig_learning_curves(curve: pd.DataFrame, out: Path, dpi: int) -> None:
         ax.set_title(title)
         ax.set_xticks(sorted(curve["n_train_videos"].unique()))
         ax.legend()
-    fig.suptitle("Gains flatten after a few training videos; spread across held-out videos stays wide", x=0.01, ha="left", fontweight="bold")
+    fig.suptitle("Held-out scores improve with more training videos, with diminishing returns", x=0.01, ha="left", fontweight="bold")
     fig.tight_layout()
     _save(fig, out / "09_learning_curves.png", dpi)
 
@@ -371,7 +371,7 @@ def fig_threshold(oof: pd.DataFrame, thresholds: pd.DataFrame, out: Path, dpi: i
         color, marker, line = MODEL_STYLE["classification"][key]
         scores = [f1_score(y, (oof[f"cls_{key}"] >= t).astype(int), zero_division=0) for t in grid]
         ax.plot(grid, scores, color=color, linestyle=line, linewidth=2, label=_label("classification", key))
-        chosen = thresholds[thresholds["model"] == key]["threshold"].mean()
+        chosen = thresholds[(thresholds["model"] == key) & (thresholds["task"] == "classification")]["threshold"].mean()
         ax.scatter([chosen], [f1_score(y, (oof[f"cls_{key}"] >= chosen).astype(int), zero_division=0)],
                    color=color, marker=marker, s=60, zorder=3, edgecolor=SURFACE, linewidth=1.5)
     ax.set_xlabel("Probability threshold")
@@ -449,6 +449,35 @@ def fig_per_video(per_video: pd.DataFrame, out: Path, dpi: int) -> None:
     _save(fig, out / "18_per_video_hit1.png", dpi)
 
 
+def fig_ablation(ablation: pd.DataFrame, out: Path, dpi: int) -> None:
+    """What each improvement step adds, for every model, on the headline metric of each task."""
+    variants = list(dict.fromkeys(ablation["variant"]))
+    colors = [BASELINE, SLOTS[0], SLOTS[2]]
+    panels = [
+        ("regression", "r2", "Regression R²", REGRESSORS),
+        ("classification", "f1", "Classification F1", CLASSIFIERS),
+        ("classification", "pr_auc", "Classification PR-AUC", CLASSIFIERS),
+        ("classification", "hit_at_1", "Search Hit@1 (classifiers)", CLASSIFIERS),
+    ]
+    fig, axes = plt.subplots(1, len(panels), figsize=(15, 4.4))
+    width = 0.26
+    for ax, (task, metric, title, models) in zip(axes, panels):
+        for i, variant in enumerate(variants):
+            part = ablation[(ablation["variant"] == variant) & (ablation["task"] == task)].set_index("model").loc[list(models)]
+            positions = np.arange(len(models)) + (i - 1) * width
+            ax.bar(positions, part[metric], width=width * 0.92, color=colors[i % 3], label=variant)
+            for pos, value in zip(positions, part[metric]):
+                ax.text(pos, value + 0.008, f"{value:.2f}", ha="center", fontsize=7, color=INK)
+        ax.set_xticks(np.arange(len(models)), [m.replace(" ", "\n", 1) for m in models.values()], fontsize=8)
+        ax.set_title(title)
+        ax.grid(axis="x", visible=False)
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="lower center", ncol=3, frameon=False)
+    fig.suptitle("What each improvement adds (held-out videos)", x=0.01, ha="left", fontweight="bold")
+    fig.subplots_adjust(left=0.04, right=0.99, top=0.84, bottom=0.2, wspace=0.22)
+    _save(fig, out / "19_ablation.png", dpi)
+
+
 # ------------------------------------------------------------------------ entry
 
 
@@ -482,4 +511,6 @@ def make_all_plots(cfg: object) -> None:
     fig_retrieval(retrieval, ks, figures, dpi)
     fig_alpha_sweep(pd.read_csv(tables / "alpha_sweep.csv"), retrieval, cfg.ml.baseline_alpha, figures, dpi)
     fig_per_video(pd.read_csv(tables / "retrieval_per_video.csv"), figures, dpi)
+    if (tables / "ablation.csv").exists():
+        fig_ablation(pd.read_csv(tables / "ablation.csv"), figures, dpi)
     print(f"Saved figures to {figures}")

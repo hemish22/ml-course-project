@@ -81,6 +81,11 @@ class MLConfig:
     baseline_alpha: float
     relevance_decay_s: float
     smooth_window: int
+    near_window: int
+    wide_window: int
+    scene_cut_threshold: float
+    output_smooth_windows: tuple[int, ...]
+    n_jobs: int
     inner_folds: int
     permutation_repeats: int
     retrieval_ks: tuple[int, ...]
@@ -143,6 +148,11 @@ def _build_config(data: dict[str, Any]) -> Config:
                 baseline_alpha=ml["baseline_alpha"],
                 relevance_decay_s=ml["relevance_decay_s"],
                 smooth_window=ml["smooth_window"],
+                near_window=ml["near_window"],
+                wide_window=ml["wide_window"],
+                scene_cut_threshold=ml["scene_cut_threshold"],
+                output_smooth_windows=tuple(ml["output_smooth_windows"]),
+                n_jobs=ml["n_jobs"],
                 inner_folds=ml["inner_folds"],
                 permutation_repeats=ml["permutation_repeats"],
                 retrieval_ks=tuple(ml["retrieval_ks"]),

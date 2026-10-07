@@ -29,7 +29,8 @@ from analysis.evaluate import (
     run_experiment,
     summarise_folds,
 )
-from analysis.features import build_dataset
+from analysis.evaluate import summarise_variant
+from analysis.features import FEATURES, FEATURES_BASE, build_dataset
 from cmvs.config import load_config
 
 
@@ -54,7 +55,7 @@ def write_retrieval_tables(cfg: object, tables: Path) -> None:
 def main() -> None:
     """Run the requested analysis steps."""
     parser = argparse.ArgumentParser(description="Regression and classification analysis.")
-    parser.add_argument("--step", choices=["build", "train", "retrieval", "plots", "all"], default="all")
+    parser.add_argument("--step", choices=["build", "train", "ablation", "retrieval", "plots", "all"], default="all")
     parser.add_argument("--force", action="store_true", help="Recompute outputs that already exist.")
     args = parser.parse_args()
     cfg = load_config()
@@ -85,6 +86,21 @@ def main() -> None:
         pooled_reg.to_csv(tables / "regression_pooled.csv", index=False)
         pooled_cls.to_csv(tables / "classification_pooled.csv", index=False)
         print(f"Saved tables to {tables}")
+
+    ablation_path = tables / "ablation.csv"
+    if args.step in ("ablation", "all") and (args.force or not ablation_path.exists()):
+        dataset = pd.read_csv(dataset_path)
+        variants = {}
+        for label, feats, smooth in (
+            ("Original 15 features", FEATURES_BASE, False),
+            ("+ context features", FEATURES, False),
+        ):
+            variants[label] = run_experiment(dataset, cfg, features=feats, smooth=smooth, light=True).oof
+        variants["+ output smoothing"] = pd.read_csv(oof_path)
+        pd.concat(
+            [summarise_variant(label, oof, dataset, cfg) for label, oof in variants.items()], ignore_index=True
+        ).to_csv(ablation_path, index=False)
+        print(f"Saved ablation -> {ablation_path}")
 
     if args.step in ("train", "retrieval", "all") and oof_path.exists():
         write_retrieval_tables(cfg, tables)

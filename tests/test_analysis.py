@@ -62,7 +62,7 @@ def _timeline(n: int = 12) -> ScoreTimeline:
     t = np.arange(n, dtype=np.float32)
     visual = np.linspace(0, 1, n).astype(np.float32)
     speech = np.where(t < 6, 0.5, 0.0).astype(np.float32)
-    meta_t = {"start": [0.0], "end": [6.0], "text": ["hi"], "seg_idx": [0]}
+    meta_t = {"start": [0.0], "end": [6.0], "text": ["three words matter"], "seg_idx": [0]}
     return ScoreTimeline(t, visual, speech, 0.6 * visual + 0.4 * speech, {}, meta_t,
                          visual_raw=visual * 0.3, transcript_raw=speech)
 
@@ -71,7 +71,9 @@ def test_features_for_query_has_every_feature_and_both_labels() -> None:
     query = BenchmarkQuery(7, "vid", "three words here", 2.0, 5.0)
     embeddings = np.tile(np.array([[1.0, 0.0]], dtype=np.float32), (12, 1))
 
-    frame = features_for_query(_timeline(), embeddings, 12.0, query, 0.6, 2, 5.0)
+    ml = SimpleNamespace(baseline_alpha=0.6, smooth_window=2, relevance_decay_s=5.0, near_window=3,
+                         wide_window=5, scene_cut_threshold=0.5)
+    frame = features_for_query(_timeline(), embeddings, 12.0, query, ml)
 
     assert set(FEATURES) <= set(frame.columns)
     assert len(frame) == 12 and frame["query_id"].eq(7).all()
@@ -79,6 +81,9 @@ def test_features_for_query_has_every_feature_and_both_labels() -> None:
     assert frame["query_words"].eq(3).all()
     assert frame["rel_binary"].sum() == 3
     assert not frame[FEATURES].isna().any().any()
+    assert frame["keyword_overlap"].tolist() == pytest.approx([2 / 3] * 6 + [0.0] * 6)
+    assert frame["visual_peak_dist"].iloc[-1] == pytest.approx(0.0)  # visual score peaks at the last second
+    assert frame["visual_vs_peak"].max() == pytest.approx(1.0)
 
 
 def test_best_f1_threshold_separates_clean_scores() -> None:
@@ -125,7 +130,8 @@ def _tiny_cfg() -> SimpleNamespace:
         "gradient_boosting": {"learning_rate": [0.1], "max_depth": [3], "max_iter": [20]},
         "logistic": {"C": [1.0]}, "knn": {"n_neighbors": [5]},
     }
-    return SimpleNamespace(ml=SimpleNamespace(seed=0, inner_folds=2, permutation_repeats=1, grids=grids))
+    return SimpleNamespace(ml=SimpleNamespace(seed=0, n_jobs=1, inner_folds=2, permutation_repeats=1, grids=grids,
+                                               output_smooth_windows=(1, 3)))
 
 
 def test_experiment_predictions_come_from_held_out_videos_and_learn_the_signal() -> None:
@@ -157,3 +163,19 @@ def test_retrieval_metrics_rank_informative_scores_above_random() -> None:
     assert table.loc["Fixed-weight fusion", "hit_at_1_lo"] <= table.loc["Fixed-weight fusion", "hit_at_1_hi"]
     assert "query_id" not in table.columns
     assert len(sweep) == 3
+
+
+def test_smoothing_averages_within_each_query_only() -> None:
+    from analysis.evaluate import choose_smoothing_window, smooth_by_query
+
+    values = np.array([0.0, 3.0, 0.0, 9.0, 0.0, 9.0])
+    queries = np.array([0, 0, 0, 1, 1, 1])
+
+    smoothed = smooth_by_query(values, queries, 3)
+
+    assert smoothed[:3].tolist() == pytest.approx([1.5, 1.0, 1.5])  # never mixes query 0 into query 1
+    assert smoothed[3:].tolist() == pytest.approx([4.5, 6.0, 4.5])
+    assert smooth_by_query(values, queries, 1).tolist() == values.tolist()
+    noisy = np.tile([0.0, 1.0], 20)
+    truth = np.full(40, 0.5)
+    assert choose_smoothing_window("regression", noisy, truth, np.zeros(40), (1, 3, 5)) in (3, 5)

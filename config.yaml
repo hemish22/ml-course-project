@@ -42,6 +42,11 @@ ml:
   baseline_alpha: 0.6        # fixed fusion weight the learned models are compared against
   relevance_decay_s: 5.0     # graded regression label decays as exp(-distance / decay) outside the true interval
   smooth_window: 2           # seconds either side used for neighbour-smoothed scores
+  near_window: 5             # seconds either side for the "near" context features
+  wide_window: 10            # seconds either side for the "wide" context features
+  scene_cut_threshold: 0.5   # frame-to-frame cosine distance above which a second counts as a scene cut
+  output_smooth_windows: [1, 3, 5, 9, 15]  # candidate widths (seconds) for smoothing model outputs; chosen on training videos
+  n_jobs: 9                  # leave-one-video-out folds trained in parallel (one core each)
   inner_folds: 3             # grouped CV folds used for hyper-parameter search
   permutation_repeats: 3
   retrieval_ks: [1, 5]

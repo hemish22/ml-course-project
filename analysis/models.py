@@ -41,7 +41,7 @@ def make_model(name: str, task: str, seed: int, params: dict[str, Any] | None = 
         table = {
             "dummy": ("passthrough", DummyRegressor(strategy="mean")),
             "ridge": (StandardScaler(), Ridge()),
-            "random_forest": ("passthrough", RandomForestRegressor(n_jobs=-1, random_state=seed)),
+            "random_forest": ("passthrough", RandomForestRegressor(n_jobs=1, random_state=seed)),
             "gradient_boosting": ("passthrough", HistGradientBoostingRegressor(random_state=seed)),
         }
     elif task == "classification":
@@ -51,7 +51,7 @@ def make_model(name: str, task: str, seed: int, params: dict[str, Any] | None = 
                 StandardScaler(),
                 LogisticRegression(class_weight="balanced", max_iter=2000, random_state=seed),
             ),
-            "knn": (StandardScaler(), KNeighborsClassifier(n_jobs=-1)),
+            "knn": (StandardScaler(), KNeighborsClassifier(n_jobs=1)),
             "gradient_boosting": (
                 "passthrough",
                 HistGradientBoostingClassifier(class_weight="balanced", random_state=seed),
