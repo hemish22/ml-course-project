@@ -16,7 +16,7 @@ from docx import Document
 from docx.enum.section import WD_SECTION
 from docx.enum.style import WD_STYLE_TYPE
 from docx.enum.table import WD_TABLE_ALIGNMENT
-from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_BREAK, WD_LINE_SPACING, WD_TAB_ALIGNMENT
+from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_BREAK, WD_LINE_SPACING, WD_TAB_ALIGNMENT, WD_TAB_LEADER
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.shared import Inches, Pt, RGBColor
@@ -71,10 +71,13 @@ def _field(paragraph, instruction: str, placeholder: str = "") -> None:
 class Report:
     """Append guideline-formatted content to a copy of the template's cover page."""
 
-    def __init__(self, template: Path, keep_elements: int) -> None:
+    def __init__(self, template: Path, keep_elements: int | None = None) -> None:
         self.doc = Document(str(template))
         body = self.doc.element.body
         children = list(body.iterchildren())
+        if keep_elements is None:  # the cover ends with the template's first section break
+            keep_elements = next(i + 1 for i, el in enumerate(children)
+                                 if el.find(qn("w:pPr") + "/" + qn("w:sectPr")) is not None)
         for element in children[keep_elements:]:
             if element.tag != qn("w:sectPr"):
                 body.remove(element)
@@ -83,6 +86,7 @@ class Report:
         self.table = 0
         self.eq_no = 0
         self._fresh_section = True
+        self._break_next = False
         self._styles()
 
     # ------------------------------------------------------------------ styles
@@ -142,6 +146,20 @@ class Report:
             tt.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.LEFT
             tt.paragraph_format.line_spacing_rule = WD_LINE_SPACING.SINGLE
             tt.paragraph_format.space_after = Pt(0)
+        # Compact index entries (TOC, list of figures / tables) with dotted right-aligned page numbers.
+        text_width = Inches(8.27 - 1.5 - 1)
+        for name, indent in (("toc 1", 0.0), ("toc 2", 0.3), ("table of figures", 0.0)):
+            style = get(name)
+            style.base_style = normal
+            _set_font(style, size=11 if name == "toc 1" else 10.5, bold=name == "toc 1")
+            pf = style.paragraph_format
+            pf.alignment = WD_ALIGN_PARAGRAPH.LEFT
+            pf.line_spacing_rule = WD_LINE_SPACING.SINGLE
+            pf.space_before = Pt(2 if name == "toc 1" else 0)
+            pf.space_after = Pt(0)
+            pf.left_indent = Inches(indent + (0.6 if name == "table of figures" else 0))
+            pf.first_line_indent = Inches(-0.6 if name == "table of figures" else 0)
+            pf.tab_stops.add_tab_stop(text_width, WD_TAB_ALIGNMENT.RIGHT, WD_TAB_LEADER.DOTS)
         for name in ("List Bullet", "List Number"):
             if name in names:
                 _set_font(styles[name], size=12)
@@ -150,7 +168,11 @@ class Report:
                 styles[name].paragraph_format.space_after = Pt(3)
 
     def _p(self, style: str = "Report Body"):
-        return self.doc.add_paragraph(style=style)
+        p = self.doc.add_paragraph(style=style)
+        if self._break_next:  # page break carried by the paragraph itself: never leaves an empty page
+            p.paragraph_format.page_break_before = True
+            self._break_next = False
+        return p
 
     # ---------------------------------------------------------------- sections
     def new_section(self, page_format: str, start: int = 1, footer_page_number: bool = True) -> None:
@@ -189,7 +211,8 @@ class Report:
                 _set_font(r, size=11)
 
     def page_break(self) -> None:
-        self._p().add_run().add_break(WD_BREAK.PAGE)
+        """Start the next paragraph on a new page."""
+        self._break_next = True
 
     # ------------------------------------------------------------------ blocks
     def title(self, text: str, size: float = 16, space_after: float = 12, toc: bool = False) -> None:
@@ -289,12 +312,19 @@ class Report:
     def next_table_label(self) -> str:
         return f"Table {self.chapter}.{self.table + 1}"
 
-    def table_block(self, caption: str, header: Sequence[str], rows: Sequence[Sequence[str]],
+    def plain_table(self, header: Sequence[str], rows: Sequence[Sequence[str]],
+                    widths: Sequence[float] | None = None) -> None:
+        """Unnumbered, uncaptioned table (e.g. the abbreviation list)."""
+        self.table_block(None, header, rows, widths)
+
+    def table_block(self, caption: str | None, header: Sequence[str], rows: Sequence[Sequence[str]],
                     widths: Sequence[float] | None = None, interpretation: str | None = None,
                     bold_rows: Sequence[int] = ()) -> str:
-        self.table += 1
-        label = f"Table {self.chapter}.{self.table}"
-        self._p("Table Caption").add_run(f"{label}: {caption}")
+        label = ""
+        if caption is not None:
+            self.table += 1
+            label = f"Table {self.chapter}.{self.table}"
+            self._p("Table Caption").add_run(f"{label}: {caption}")
         table = self.doc.add_table(rows=1 + len(rows), cols=len(header))
         table.style = self.doc.styles["Table Grid"] if "Table Grid" in [s.name for s in self.doc.styles] else None
         table.alignment = WD_TABLE_ALIGNMENT.CENTER

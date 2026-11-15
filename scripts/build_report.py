@@ -1,7 +1,7 @@
 """Build the integrated PBL-1/2/3 project report (Word) from the template and saved results.
 
 Usage:
-    python scripts/build_report.py --template "<path to sample template .docx>"
+    python scripts/build_report.py            # cover taken from report/cover.docx
 
 Every number in the report is read from the saved result tables, so rerunning the
 experiments and then this script keeps the report consistent with the code.
@@ -59,10 +59,11 @@ def load_results() -> dict:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--template", required=True, type=Path)
+    parser.add_argument("--template", type=Path, default=ROOT / "report" / "cover.docx",
+                        help="Document whose cover page (everything before its first section break) is kept.")
     parser.add_argument("--out", type=Path, default=ROOT / "report" / "ML_Project_Report.docx")
-    parser.add_argument("--cover-elements", type=int, default=35,
-                        help="Body elements of the template kept as the cover page.")
+    parser.add_argument("--cover-elements", type=int, default=None,
+                        help="Body elements kept as the cover (default: up to the first section break).")
     args = parser.parse_args()
     args.out.parent.mkdir(parents=True, exist_ok=True)
     report = Report(args.template, args.cover_elements)
