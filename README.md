@@ -2,12 +2,63 @@
 
 Searches inside videos using frozen CLIP frame embeddings and Whisper transcript
 segments. Visual and transcript scores are independently calibrated, fused on a
-frame timeline, and grouped into timestamped moments. This project contains no
-training, fine-tuning, or LoRA workflows.
+frame timeline, and grouped into timestamped moments. The pretrained encoders
+are never fine-tuned.
+
+The CLIP, Whisper, and MiniLM encoders remain frozen. The `analysis/` package
+fits small regression, classification, clustering, and HMM models on their
+existing features.
+
+## Review 3 (PBL-3): ensemble learning
+
+[The executed notebook](notebooks/pbl3_ensemble.ipynb) and
+[the generated report](results/ensemble/ENSEMBLE_REPORT.md) cover the four PBL-3 criteria.
+`analysis/ensemble.py` fits CART, bagging, random forest, extra trees, AdaBoost,
+histogram gradient boosting, soft voting, stacking and Bayesian model averaging
+(pseudo-BMA+) on the same 31 features and leave-one-video-out folds as Reviews 1–2,
+with grouped inner cross-validation for CART depth, stacking, BMA weights, smoothing
+and thresholds.
+
+```bash
+python scripts/run_ensemble.py               # ~10 min on 9 cores; cached folds are reused
+python scripts/build_ensemble_notebook.py    # rebuilds and executes the notebook
+scripts/render_report_pdf.sh "<template.docx>"  # integrated Word/PDF report in report/
+```
+
+Mean held-out-video F1: Bayesian model averaging **0.771** (PR-AUC 0.853), stacking
+0.765, soft voting 0.763, CART 0.761, random forest 0.755, versus logistic regression
+0.761 (0.845). The paired gain over logistic regression is small (+0.010 F1, 7/9
+videos) and only marginally significant.
+
+## Review 2: clustering and Hidden Markov Models
+
+Start with **[the executed review notebook](notebooks/review_clustering_hmm.ipynb)**
+or open **[the browser presentation](results/review/review.html)** directly.
+[The review report](results/review/REVIEW_REPORT.md) follows the five 4-mark criteria.
+The earlier notebook and results remain available separately.
+
+The new experiments compare K-means, Gaussian mixtures, and a Gaussian HMM with
+the original baselines and classifiers, holding out entire videos. The HMM is
+implemented directly in `analysis/hmm.py` (Baum-Welch, forward-backward, Viterbi).
+The models use training labels only to interpret clusters/states as relevance;
+their fitting and cluster/state-count selection are unsupervised.
+
+```bash
+# With the existing feature table: no video download or encoder inference needed
+python -m pip install -r requirements-review.txt
+python scripts/run_review.py              # reuses matching cached folds
+python scripts/execute_review_notebook.py # executes and saves rich notebook outputs
+```
+
+Mean held-out-video F1: K-means **0.633**, Gaussian mixture **0.557**, Gaussian HMM
+**0.554**, fixed fusion **0.500**, and earlier logistic regression **0.761**.
+The HMM does not outperform K-means or the earlier classifier on this benchmark.
+See the report for calibration differences, uncertainty, metrics, and failure cases.
+These models are analysis experiments; the app continues to use its existing fusion.
 
 ## Setup
 
-Use Python 3.10 on the GPU machine, ensure `ffmpeg` and `ffprobe` are on
+Use Python 3.10+ (the local review was validated with 3.11), ensure `ffmpeg` and `ffprobe` are on
 `PATH`, then install the project requirements:
 
 ```bash
@@ -18,6 +69,13 @@ Set all paths, models, inference settings, and retrieval thresholds in
 `config.yaml`. The first actual inference downloads the configured model weights.
 
 ## Run
+
+On macOS, `./run-local.command` installs missing local dependencies, starts both
+servers, waits for startup, and opens the browser. It uses `.venv/` and stores
+logs under `.runtime/`. The first setup needs internet access. Run it from your
+own Terminal; restricted agent sessions may prohibit localhost sockets.
+
+To start the components manually:
 
 Index a video, then start the API and the web app (two terminals):
 

@@ -1,0 +1,77 @@
+{
+  "signature": "ea769b63f7096ee1cffda0beacaa65db9db6a8280817804c0a2fb440235db44a",
+  "settings": {
+    "ensemble": {
+      "inner_folds": 3,
+      "cart_depths": [
+        4,
+        6,
+        8,
+        12
+      ],
+      "logistic_C": 0.1,
+      "knn_neighbors": 151,
+      "n_estimators": 300,
+      "min_samples_leaf": 5,
+      "adaboost": {
+        "n_estimators": 300,
+        "learning_rate": 0.5,
+        "max_depth": 2
+      },
+      "gradient_boosting": {
+        "max_iter": 300,
+        "learning_rate": 0.05,
+        "max_leaf_nodes": 31,
+        "l2_regularization": 1.0
+      },
+      "voting_members": [
+        "logistic",
+        "random_forest",
+        "gradient_boosting"
+      ],
+      "stacking_members": [
+        "logistic",
+        "knn",
+        "cart",
+        "bagging",
+        "random_forest",
+        "extra_trees",
+        "adaboost",
+        "gradient_boosting"
+      ],
+      "bma_bootstrap": 1000,
+      "size_curve": [
+        1,
+        2,
+        5,
+        10,
+        25,
+        50,
+        100,
+        200,
+        300
+      ],
+      "n_jobs": 9,
+      "output_dir": "results/ensemble"
+    },
+    "seed": 42,
+    "windows": [
+      1,
+      3,
+      5,
+      9,
+      15
+    ],
+    "libraries": {
+      "numpy": "1.26.4",
+      "pandas": "2.1.4",
+      "scipy": "1.17.1",
+      "scikit-learn": "1.5.0"
+    }
+  },
+  "n_rows": 28900,
+  "n_videos": 9,
+  "n_queries": 86,
+  "positive_rows": 2385,
+  "n_features": 31
+}

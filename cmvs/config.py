@@ -95,6 +95,44 @@ class MLConfig:
 
 
 @dataclass(frozen=True)
+class ReviewConfig:
+    """Clustering and sequence-model experiment settings; encoders stay frozen."""
+
+    features: tuple[str, ...]
+    cluster_counts: tuple[int, ...]
+    hmm_states: tuple[int, ...]
+    n_init: int
+    max_iter: int
+    tolerance: float
+    min_covar: float
+    pseudocount: float
+    silhouette_sample: int
+    bootstrap_samples: int
+    ranking_decimals: int
+    output_dir: Path
+
+
+@dataclass(frozen=True)
+class EnsembleConfig:
+    """PBL-3 ensemble-learning experiment settings (same features and video folds)."""
+
+    inner_folds: int
+    cart_depths: tuple[int, ...]
+    logistic_C: float
+    knn_neighbors: int
+    n_estimators: int
+    min_samples_leaf: int
+    adaboost: dict[str, Any]
+    gradient_boosting: dict[str, Any]
+    voting_members: tuple[str, ...]
+    stacking_members: tuple[str, ...]
+    bma_bootstrap: int
+    size_curve: tuple[int, ...]
+    n_jobs: int
+    output_dir: Path
+
+
+@dataclass(frozen=True)
 class Config:
     """The complete immutable application configuration."""
 
@@ -105,6 +143,8 @@ class Config:
     search: SearchConfig
     evaluation: EvaluationConfig
     ml: MLConfig
+    review: ReviewConfig | None = None
+    ensemble: EnsembleConfig | None = None
 
 
 def _require_mapping(value: object, section: str) -> dict[str, Any]:
@@ -160,6 +200,23 @@ def _build_config(data: dict[str, Any]) -> Config:
                 tables_dir=Path(ml["tables_dir"]),
                 grids=dict(_require_mapping(ml["grids"], "ml.grids")),
             ),
+            review=(ReviewConfig(
+                **{**data["review"],
+                   "features": tuple(data["review"]["features"]),
+                   "cluster_counts": tuple(data["review"]["cluster_counts"]),
+                   "hmm_states": tuple(data["review"]["hmm_states"]),
+                   "output_dir": Path(data["review"]["output_dir"])}
+            ) if "review" in data else None),
+            ensemble=(EnsembleConfig(
+                **{**data["ensemble"],
+                   "cart_depths": tuple(data["ensemble"]["cart_depths"]),
+                   "adaboost": dict(data["ensemble"]["adaboost"]),
+                   "gradient_boosting": dict(data["ensemble"]["gradient_boosting"]),
+                   "voting_members": tuple(data["ensemble"]["voting_members"]),
+                   "stacking_members": tuple(data["ensemble"]["stacking_members"]),
+                   "size_curve": tuple(data["ensemble"]["size_curve"]),
+                   "output_dir": Path(data["ensemble"]["output_dir"])}
+            ) if "ensemble" in data else None),
         )
     except (KeyError, TypeError) as exc:
         raise ValueError(f"Invalid configuration: {exc}") from exc

@@ -1,5 +1,9 @@
 # Needle: Cross-Modal Video Search
 
+**Next review:** [Clustering and Hidden Markov Model report](results/review/REVIEW_REPORT.md)
+and [executed notebook](notebooks/review_clustering_hmm.ipynb) cover the professor's
+five new criteria. This report documents the earlier pipeline and supervised analysis.
+
 ## 1. What it is
 
 Needle finds moments inside a video from a plain-language query. You type

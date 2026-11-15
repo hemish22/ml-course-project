@@ -1,0 +1,91 @@
+held_out,method,k,silhouette,inertia,bic,converged,iterations
+a-remote-possibility,K-means,2,0.3302952595480574,139089.07621070897,,,
+a-remote-possibility,K-means,3,0.19833276079137682,118708.70377384262,,,
+a-remote-possibility,K-means,4,0.22484574695354584,95928.17771917125,,,
+a-remote-possibility,K-means,5,0.2399889875473704,83053.95906935228,,,
+a-remote-possibility,Gaussian mixture,2,0.2782576839655177,,411605.2521649011,True,
+a-remote-possibility,Gaussian mixture,3,0.35405806115339633,,338536.8836543245,True,
+a-remote-possibility,Gaussian mixture,4,0.20263437805791762,,324335.1512878869,True,
+a-remote-possibility,Gaussian mixture,5,0.1739475515145947,,314993.14044213545,False,
+a-remote-possibility,Gaussian HMM,2,,,392460.1224136333,True,9.0
+a-remote-possibility,Gaussian HMM,3,,,320649.10790112155,True,12.0
+administrator-chats-astronauts,K-means,2,0.3263658668753886,167447.2544550343,,,
+administrator-chats-astronauts,K-means,3,0.36755946700770864,139357.8407663251,,,
+administrator-chats-astronauts,K-means,4,0.218249501590509,115877.12971186626,,,
+administrator-chats-astronauts,K-means,5,0.23086320868480167,100674.24215098217,,,
+administrator-chats-astronauts,Gaussian mixture,2,0.26618325148876415,,490954.45836299966,True,
+administrator-chats-astronauts,Gaussian mixture,3,0.36026253341386816,,404073.29202621465,True,
+administrator-chats-astronauts,Gaussian mixture,4,0.12817715526043222,,387786.8590718347,True,
+administrator-chats-astronauts,Gaussian mixture,5,0.1680025250926124,,375196.8262545717,True,
+administrator-chats-astronauts,Gaussian HMM,2,,,468338.2608479355,True,10.0
+administrator-chats-astronauts,Gaussian HMM,3,,,381737.99352159,True,4.0
+commercial-crew-milestone,K-means,2,0.32488699210600985,163271.77921919382,,,
+commercial-crew-milestone,K-means,3,0.19282490528649288,139394.47960726023,,,
+commercial-crew-milestone,K-means,4,0.20205640725650015,124120.99635793624,,,
+commercial-crew-milestone,K-means,5,0.227819514408719,98107.60877842744,,,
+commercial-crew-milestone,Gaussian mixture,2,0.2766109750499892,,479600.55667657405,True,
+commercial-crew-milestone,Gaussian mixture,3,0.3748085136359056,,394598.8363776159,True,
+commercial-crew-milestone,Gaussian mixture,4,0.12499445054584774,,379428.5512188223,True,
+commercial-crew-milestone,Gaussian mixture,5,0.20011327819666577,,370519.5365882497,True,
+commercial-crew-milestone,Gaussian HMM,2,,,457595.2265748134,True,10.0
+commercial-crew-milestone,Gaussian HMM,3,,,374156.37088625436,True,12.0
+cosmic-phenomenon,K-means,2,0.32750409435276706,171503.1397629069,,,
+cosmic-phenomenon,K-means,3,0.1828044748601996,146502.06210996635,,,
+cosmic-phenomenon,K-means,4,0.2158541723589424,118535.1379763426,,,
+cosmic-phenomenon,K-means,5,0.225949705380983,102816.89579700996,,,
+cosmic-phenomenon,Gaussian mixture,2,0.27675433228425333,,504378.6279313938,True,
+cosmic-phenomenon,Gaussian mixture,3,0.36530832499512145,,414715.7644886662,True,
+cosmic-phenomenon,Gaussian mixture,4,0.1302003610677902,,397614.0141779541,True,
+cosmic-phenomenon,Gaussian mixture,5,0.1390881158674066,,386677.7194160842,True,
+cosmic-phenomenon,Gaussian HMM,2,,,481284.10711250716,True,10.0
+cosmic-phenomenon,Gaussian HMM,3,,,393357.98776555376,True,12.0
+hubble-exoplanet,K-means,2,0.3068804856069124,166364.80070715945,,,
+hubble-exoplanet,K-means,3,0.3579814817570811,138303.12102425811,,,
+hubble-exoplanet,K-means,4,0.2192894886261123,115296.13893759304,,,
+hubble-exoplanet,K-means,5,0.22549781239817004,100124.95403337765,,,
+hubble-exoplanet,Gaussian mixture,2,0.25954402407207694,,489306.28180027567,True,
+hubble-exoplanet,Gaussian mixture,3,0.34406756052654314,,402562.0429900908,True,
+hubble-exoplanet,Gaussian mixture,4,0.1854814109499539,,387519.12492678635,True,
+hubble-exoplanet,Gaussian mixture,5,0.18769048385443904,,377549.4559211325,True,
+hubble-exoplanet,Gaussian HMM,2,,,466734.63068908727,True,10.0
+hubble-exoplanet,Gaussian HMM,3,,,379985.53141317057,True,4.0
+mars-mission-briefed,K-means,2,0.33631755357724025,167450.74554054503,,,
+mars-mission-briefed,K-means,3,0.1839666565660246,143418.59550806374,,,
+mars-mission-briefed,K-means,4,0.21201912508353837,116063.22772471294,,,
+mars-mission-briefed,K-means,5,0.22401402355949906,100824.27550610784,,,
+mars-mission-briefed,Gaussian mixture,2,0.28568171767156864,,493745.71926144586,True,
+mars-mission-briefed,Gaussian mixture,3,0.3654149957156394,,406273.1417744863,True,
+mars-mission-briefed,Gaussian mixture,4,0.13720581294791984,,389624.795077034,True,
+mars-mission-briefed,Gaussian mixture,5,0.14490171604396118,,379506.5637849076,True,
+mars-mission-briefed,Gaussian HMM,2,,,470725.28805677197,True,10.0
+mars-mission-briefed,Gaussian HMM,3,,,384664.1067643697,True,12.0
+new-explorers-new-roadmap,K-means,2,0.3343418633350065,160767.18838512307,,,
+new-explorers-new-roadmap,K-means,3,0.19857236175177986,137932.98590411618,,,
+new-explorers-new-roadmap,K-means,4,0.21797996737491918,111697.03739199147,,,
+new-explorers-new-roadmap,K-means,5,0.2236870915662773,96805.75600228738,,,
+new-explorers-new-roadmap,Gaussian mixture,2,0.2809525849628961,,474543.3511790389,True,
+new-explorers-new-roadmap,Gaussian mixture,3,0.3529661384356427,,391041.9293443316,True,
+new-explorers-new-roadmap,Gaussian mixture,4,0.13519174391728409,,375526.3619644968,True,
+new-explorers-new-roadmap,Gaussian mixture,5,0.15585439600509432,,365556.5693464065,True,
+new-explorers-new-roadmap,Gaussian HMM,2,,,452426.06845435716,True,10.0
+new-explorers-new-roadmap,Gaussian HMM,3,,,370857.12685471395,True,12.0
+smoke-and-fire,K-means,2,0.3090616904241861,163404.94437595256,,,
+smoke-and-fire,K-means,3,0.19120576261055455,139876.67801188922,,,
+smoke-and-fire,K-means,4,0.21831394193018036,113190.62740875906,,,
+smoke-and-fire,K-means,5,0.23096988838967816,98200.22840709805,,,
+smoke-and-fire,Gaussian mixture,2,0.2721433481960802,,482530.5621868828,True,
+smoke-and-fire,Gaussian mixture,3,0.35202295162099784,,397224.50707816734,True,
+smoke-and-fire,Gaussian mixture,4,0.14559154106475913,,380971.1677347396,True,
+smoke-and-fire,Gaussian mixture,5,0.15616550881272898,,370894.9049288795,True,
+smoke-and-fire,Gaussian HMM,2,,,460184.0467725559,True,9.0
+smoke-and-fire,Gaussian HMM,3,,,376247.2334316107,True,12.0
+this-week-at-nasa,K-means,2,0.3514898718967454,115113.82734395117,,,
+this-week-at-nasa,K-means,3,0.19316264831360047,97436.18967859354,,,
+this-week-at-nasa,K-means,4,0.2201177740959394,78299.80354790976,,,
+this-week-at-nasa,K-means,5,0.23601465752554535,67790.75078427343,,,
+this-week-at-nasa,Gaussian mixture,2,0.2790210241691981,,345074.313630831,True,
+this-week-at-nasa,Gaussian mixture,3,0.3573717530388271,,284475.4928344737,True,
+this-week-at-nasa,Gaussian mixture,4,0.1505691194582697,,273593.9740883076,True,
+this-week-at-nasa,Gaussian mixture,5,0.20720474117777316,,264747.34018594265,True,
+this-week-at-nasa,Gaussian HMM,2,,,329486.9115248155,True,8.0
+this-week-at-nasa,Gaussian HMM,3,,,270250.82364246895,True,11.0

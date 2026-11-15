@@ -2,6 +2,10 @@
 data/
 results/*
 !results/ml/
+!results/review/
+!results/ensemble/
+results/ensemble/folds/
+!results/report/
 
 # Python build and test artifacts
 __pycache__/
@@ -15,7 +19,11 @@ htmlcov/
 
 # Local environments and editor state
 .venv/
+.runtime/
 venv/
 .env
 .DS_Store
 .streamlit/secrets.toml
+
+# Word lock files
+~$*

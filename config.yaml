@@ -58,3 +58,35 @@ ml:
     gradient_boosting: {learning_rate: [0.05, 0.1], max_depth: [3, 6], max_iter: [200]}
     logistic: {C: [0.1, 1.0, 10.0]}
     knn: {n_neighbors: [15, 51, 151]}
+
+# Review 2: models fit on training videos only, using the existing feature table.
+review:
+  features: [visual_norm, speech_norm, visual_vs_peak, speech_vs_peak, keyword_overlap, fused_peak_dist, frame_change, in_speech]
+  cluster_counts: [2, 3, 4, 5]
+  hmm_states: [2, 3]
+  n_init: 5
+  max_iter: 40
+  tolerance: 0.001          # mean log likelihood improvement per observation
+  min_covar: 0.05          # diagonal variance floor in standardized feature units
+  pseudocount: 0.01        # prevents zero transition / initial probabilities
+  silhouette_sample: 2000
+  bootstrap_samples: 2000
+  ranking_decimals: 12      # treat floating-point noise in saturated posteriors as ties
+  output_dir: results/review
+
+# Review 3 (PBL-3): ensemble learning on the same 31-feature table and video folds.
+ensemble:
+  inner_folds: 3             # grouped (by video) inner CV for stacking, BMA, smoothing and thresholds
+  cart_depths: [4, 6, 8, 12] # single CART tree: depth chosen by inner-CV PR-AUC
+  logistic_C: 0.1            # PBL-1 inner-CV choice in all nine folds
+  knn_neighbors: 151         # PBL-1 inner-CV choice in all nine folds
+  n_estimators: 300          # trees in bagging / random forest / extra trees
+  min_samples_leaf: 5
+  adaboost: {n_estimators: 300, learning_rate: 0.5, max_depth: 2}
+  gradient_boosting: {max_iter: 300, learning_rate: 0.05, max_leaf_nodes: 31, l2_regularization: 1.0}
+  voting_members: [logistic, random_forest, gradient_boosting]
+  stacking_members: [logistic, knn, cart, bagging, random_forest, extra_trees, adaboost, gradient_boosting]
+  bma_bootstrap: 1000        # Bayesian-bootstrap draws for pseudo-BMA+ weights (queries are the units)
+  size_curve: [1, 2, 5, 10, 25, 50, 100, 200, 300]
+  n_jobs: 9                  # outer folds trained in parallel
+  output_dir: results/ensemble

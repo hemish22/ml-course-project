@@ -7,6 +7,7 @@ numpy>=1.24
 pillow>=10.0
 pandas>=2.0
 scikit-learn>=1.3  # regression/classification models in analysis/ (frozen-feature heads only)
+scipy>=1.10  # Gaussian HMM numerical routines; no extra HMM package required
 matplotlib>=3.7
 tqdm>=4.66
 pyyaml>=6.0

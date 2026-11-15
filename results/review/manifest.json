@@ -1,0 +1,47 @@
+{
+  "signature": "cf09cce904ec0a4b4a2e4e92fbe0a680e1bfb8c9e3b65208d5e6c2f45d7c8c58",
+  "settings": {
+    "review": {
+      "features": [
+        "visual_norm",
+        "speech_norm",
+        "visual_vs_peak",
+        "speech_vs_peak",
+        "keyword_overlap",
+        "fused_peak_dist",
+        "frame_change",
+        "in_speech"
+      ],
+      "cluster_counts": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "hmm_states": [
+        2,
+        3
+      ],
+      "n_init": 5,
+      "max_iter": 40,
+      "tolerance": 0.001,
+      "min_covar": 0.05,
+      "pseudocount": 0.01,
+      "silhouette_sample": 2000,
+      "bootstrap_samples": 2000,
+      "ranking_decimals": 12,
+      "output_dir": "results/review"
+    },
+    "seed": 42,
+    "libraries": {
+      "numpy": "1.26.4",
+      "pandas": "2.1.4",
+      "scipy": "1.17.1",
+      "scikit-learn": "1.5.0"
+    }
+  },
+  "n_rows": 28900,
+  "n_videos": 9,
+  "n_queries": 86,
+  "positive_rows": 2385
+}

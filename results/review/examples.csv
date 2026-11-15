@@ -1,0 +1,4 @@
+video_id,query_id,temporal_iou,selection
+this-week-at-nasa,78,0.0743801652892562,Lowest IoU
+administrator-chats-astronauts,18,0.391304347826087,Middle IoU
+mars-mission-briefed,47,1.0,Highest IoU
